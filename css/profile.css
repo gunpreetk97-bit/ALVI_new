@@ -1,0 +1,5 @@
+/* User Profile Page Styles */
+
+.profile-avatar-glow {
+  box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+}

@@ -1,0 +1,13 @@
+/* Cognitive Journey & Trend Chart Styles */
+
+.tab-btn.active {
+  background-color: #FFFFFF;
+  color: var(--color-indigo);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.exp-btn.active {
+  background-color: #FFFFFF;
+  color: var(--color-indigo);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

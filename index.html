@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALVI — Dashboard</title>
+  <meta name="description" content="Every voice has a history. AI helps reveal changes over time. ALVI supports cognitive pattern monitoring.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            alviNavy: '#172554',
+            alviIndigo: '#4F46E5',
+            alviPurple: '#8B5CF6',
+            alviGreen: '#22C55E',
+            alviAmber: '#F59E0B',
+            alviOrange: '#F97316',
+            alviText: '#0F172A',
+            alviMuted: '#64748B'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- CSS files -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  
+  <!-- Chart.js for smooth data visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="font-sans antialiased text-slate-900 bg-slate-50 h-full selection:bg-indigo-100 selection:text-indigo-900 flex overflow-hidden">
+
+  <!-- MAIN WRAPPER: 1440px desktop layout -->
+  <div id="app" class="flex w-full h-screen overflow-hidden max-w-[1600px] mx-auto bg-white shadow-2xl">
+
+    <!-- PERSISTENT ELEGANT SIDEBAR -->
+    <aside class="w-72 bg-slate-900 text-slate-300 flex flex-col justify-between border-r border-slate-800 shrink-0 z-30 select-none">
+      <div>
+        <!-- LOGO & BRANDING -->
+        <div class="p-6 border-b border-slate-800/80">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+              <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12h2l2-5 3 10 3-14 3 12 2-6 2 4 2-1h2"/>
+              </svg>
+            </div>
+            <div>
+              <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+                ALVI <span class="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">PROTOTYPE</span>
+              </span>
+              <p class="text-[11px] text-slate-400 font-medium leading-tight mt-0.5">Voice & Cognitive Intelligence</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- NAVIGATION LINKS -->
+        <nav class="p-4 space-y-1.5" id="sidebar-nav">
+          <button data-page="dashboard" class="nav-item active flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">🏠</span>
+            <span>Dashboard</span>
+          </button>
+
+          <button data-page="today-checkin" class="nav-item flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">🎙️</span>
+            <span class="flex-1 text-left">Voice Check-in</span>
+            <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          </button>
+
+          <button data-page="story-recall" class="nav-item flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">📖</span>
+            <span>Story Recall</span>
+          </button>
+
+          <button data-page="mindplay" class="nav-item flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">🎮</span>
+            <span>MindPlay</span>
+          </button>
+
+          <div class="pt-3 pb-1 px-3">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Analytics & History</p>
+          </div>
+
+          <button data-page="cognitive-journey" class="nav-item flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">📈</span>
+            <span>Cognitive Journey</span>
+          </button>
+
+          <button data-page="pattern-explorer" class="nav-item flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">🔬</span>
+            <span>Pattern Explorer</span>
+          </button>
+
+          <button data-page="ai-insights" class="nav-item flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">🧠</span>
+            <span>AI Insights</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- BOTTOM PROFILE SECTION -->
+      <div class="p-4 border-t border-slate-800/80 bg-slate-950/40">
+        <div id="profile-card-btn" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/50 border border-slate-700/50 cursor-pointer hover:bg-slate-800/80 transition">
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <div id="sidebar-avatar-initials" class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-md text-sm">
+                MS
+              </div>
+              <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+            </div>
+            <div class="overflow-hidden">
+              <p id="sidebar-profile-name" class="text-sm font-semibold text-white truncate">Mr. Sharma</p>
+              <p id="sidebar-profile-id" class="text-xs text-slate-400 truncate">ID: #ALVI-889B-IND</p>
+            </div>
+          </div>
+          <button title="Profile Settings" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-700/50 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-full bg-slate-50 overflow-y-auto relative custom-scrollbar">
+      
+      <!-- GLOBAL TOP HEADER BAR -->
+      <header class="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <span id="page-icon" class="text-2xl">🏠</span>
+          <div>
+            <h2 id="header-title" class="text-xl font-bold text-slate-900">Dashboard</h2>
+            <p id="header-subtitle" class="text-xs text-slate-500">Overview of cognitive patterns & latest check-ins</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <!-- Tagline Badge -->
+          <div class="hidden lg:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-xs font-medium text-indigo-900">
+            <span class="w-2 h-2 rounded-full bg-indigo-600 animate-ping"></span>
+            <span>"Every voice has a history. AI helps reveal changes over time."</span>
+          </div>
+
+          <button id="quick-checkin-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all flex items-center space-x-2">
+            <span>🎙️ New Check-in</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- PAGE VIEWS CONTAINER -->
+      <div id="pages-container" class="p-8 flex-1 max-w-7xl w-full mx-auto">
+
+        <!-- DASHBOARD SECTION -->
+        <section id="page-dashboard" class="page-view space-y-8">
+          <!-- Welcome Greeting -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 id="dashboard-welcome-heading" class="text-3xl font-extrabold text-slate-900 tracking-tight">Good morning, Mr. Sharma 👋</h1>
+              <p class="text-slate-500 mt-1 font-medium">Here's how your cognitive journey is evolving.</p>
+            </div>
+            <div class="flex items-center space-x-2 text-xs text-slate-500 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm">
+              <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              <span>Personal Baseline Established: <strong>Jan 2026</strong></span>
+            </div>
+          </div>
+
+          <!-- SIGNATURE HERO COMPONENT: THE VOICE JOURNEY -->
+          <div class="relative bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-8 text-white shadow-2xl overflow-hidden border border-slate-800">
+            <!-- Background Subtle Glow FX -->
+            <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute left-1/3 top-0 w-60 h-60 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <span class="text-xs uppercase font-bold tracking-wider text-indigo-400 bg-indigo-500/20 px-3 py-1 rounded-full border border-indigo-500/30">Signature Feature</span>
+                <h2 class="text-2xl font-bold text-white mt-2">YOUR ALVI JOURNEY</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Tracking voice and cognitive patterns against your personal history.</p>
+              </div>
+              <div class="hidden sm:flex items-center gap-2 text-xs text-slate-400 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Stable
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400 ml-2"></span> Monitor
+              </div>
+            </div>
+
+            <!-- THE VOICE JOURNEY TIMELINE CANVAS & INTERACTIVE NODE CONTAINER -->
+            <div class="relative py-8 my-2">
+              <div class="w-full relative flex items-center justify-between">
+                
+                <!-- Background Waveform to Timeline SVG Path -->
+                <svg class="absolute inset-0 w-full h-full overflow-visible pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1000 120">
+                  <defs>
+                    <linearGradient id="journeyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#4F46E5" stop-opacity="0.8"/>
+                      <stop offset="50%" stop-color="#8B5CF6" stop-opacity="0.8"/>
+                      <stop offset="80%" stop-color="#F59E0B" stop-opacity="0.9"/>
+                      <stop offset="100%" stop-color="#F97316" stop-opacity="1"/>
+                    </linearGradient>
+                  </defs>
+                  
+                  <path d="M 10,60 Q 30,20 50,60 T 90,60 T 130,60 T 170,60 L 220,60 L 400,60 L 600,60 L 800,60 L 980,60" fill="none" stroke="url(#journeyGradient)" stroke-width="3" stroke-linecap="round" class="timeline-svg-path"/>
+                  <path d="M 0,60 L 1000,60" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,6"/>
+                </svg>
+
+                <!-- Voice Input Visual Start Node -->
+                <div class="relative z-10 flex flex-col items-center group cursor-pointer" data-timeline-info="voice">
+                  <div class="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-400/50 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-indigo-300 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                  </div>
+                  <span class="text-xs font-semibold text-indigo-300 mt-3">VOICE</span>
+                  <span class="text-[10px] text-slate-400">Baseline Wave</span>
+                </div>
+
+                <!-- Node 1: January -->
+                <div class="relative z-10 flex flex-col items-center group cursor-pointer" data-timeline-info="jan">
+                  <div class="w-9 h-9 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center shadow-md group-hover:scale-125 transition-transform bg-slate-900">
+                    <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-200 mt-3">January</span>
+                  <span class="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 mt-0.5">Stable · 94%</span>
+                </div>
+
+                <!-- Node 2: March -->
+                <div class="relative z-10 flex flex-col items-center group cursor-pointer" data-timeline-info="mar">
+                  <div class="w-9 h-9 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center shadow-md group-hover:scale-125 transition-transform bg-slate-900">
+                    <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-200 mt-3">March</span>
+                  <span class="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 mt-0.5">Stable · 92%</span>
+                </div>
+
+                <!-- Node 3: May -->
+                <div class="relative z-10 flex flex-col items-center group cursor-pointer" data-timeline-info="may">
+                  <div class="w-9 h-9 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center shadow-md group-hover:scale-125 transition-transform bg-slate-900">
+                    <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-200 mt-3">May</span>
+                  <span class="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 mt-0.5">Stable · 91%</span>
+                </div>
+
+                <!-- Node 4: July -->
+                <div class="relative z-10 flex flex-col items-center group cursor-pointer" data-timeline-info="july">
+                  <div class="w-9 h-9 rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center shadow-md group-hover:scale-125 transition-transform bg-slate-900">
+                    <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                  </div>
+                  <span class="text-xs font-bold text-slate-200 mt-3">July</span>
+                  <span class="text-[10px] font-medium text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 mt-0.5">Monitor · 86%</span>
+                </div>
+
+                <!-- Node 5: Today -->
+                <div class="relative z-10 flex flex-col items-center group cursor-pointer scale-110" data-timeline-info="today">
+                  <div class="relative">
+                    <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-4 w-4 bg-amber-500"></span>
+                    </span>
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-indigo-600 p-0.5 shadow-xl shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                      <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center">
+                        <span class="text-base">◉</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="text-xs font-extrabold text-white mt-2 flex items-center gap-1">Today <span class="text-[9px] bg-amber-500/30 text-amber-300 px-1.5 py-0.2 rounded uppercase">Current</span></span>
+                  <span class="text-[10px] font-semibold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30 mt-0.5">Snapshot Ready</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Timeline Tooltip Modal / Card -->
+            <div id="timeline-detail-box" class="mt-4 p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 flex flex-col sm:flex-row items-center justify-between text-xs gap-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-base">
+                  📅
+                </div>
+                <div>
+                  <h4 class="font-bold text-white text-sm">Today's Check-in Status</h4>
+                  <p class="text-slate-300 text-xs">Acoustic pause density + 14% vs May baseline. Mindplay score: 84%.</p>
+                </div>
+              </div>
+              <button data-page="cognitive-journey" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold transition shrink-0">
+                Explore Full Trend →
+              </button>
+            </div>
+          </div>
+
+          <!-- PROMINENT TODAY'S CHECK-IN LAUNCHER CARD -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-gradient-to-br from-white to-slate-50 rounded-3xl p-7 border border-slate-200/90 shadow-xl shadow-slate-200/50 flex flex-col justify-between relative overflow-hidden group">
+              <div class="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-bl-full pointer-events-none -z-0"></div>
+
+              <div class="relative z-10">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">Daily Assessment</span>
+                  <span class="text-xs font-semibold text-slate-500">⏱ approx. 3 minutes</span>
+                </div>
+
+                <h3 class="text-2xl font-bold text-slate-900 tracking-tight">Today's Check-in</h3>
+                <p class="text-slate-600 text-sm mt-1">Complete your 3 connected activities to update your personal baseline snapshot.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-bold">🎙️</div>
+                    <div>
+                      <p class="text-xs font-bold text-slate-900">Voice Description</p>
+                      <p class="text-[11px] text-slate-500">Describe park scene</p>
+                    </div>
+                  </div>
+
+                  <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg font-bold">📖</div>
+                    <div>
+                      <p class="text-xs font-bold text-slate-900">Story Recall</p>
+                      <p class="text-[11px] text-slate-500">Retell Aarav's story</p>
+                    </div>
+                  </div>
+
+                  <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg font-bold">🎮</div>
+                    <div>
+                      <p class="text-xs font-bold text-slate-900">MindPlay</p>
+                      <p class="text-[11px] text-slate-500">3 cognitive challenges</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-8 pt-4 border-t border-slate-200/80 flex items-center justify-between relative z-10">
+                <span class="text-xs text-slate-500">3 activities · standard session</span>
+                <button id="start-checkin-main-btn" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center space-x-2 text-sm">
+                  <span>Start Today's Check-in</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- COMPACT LATEST AI INSIGHT CARD -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xl shadow-slate-200/40 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Latest AI Insight</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400">2 hrs ago</span>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/60 mb-4">
+                  <h4 class="text-sm font-bold text-amber-950 flex items-center gap-1.5">
+                    <span>🧠</span> Pause Pattern Shift
+                  </h4>
+                  <p class="text-xs text-amber-900/80 mt-1 leading-relaxed">
+                    Slight increase in silent hesitations observed during noun retrieval. Overall fluency remains robust at 84%.
+                  </p>
+                </div>
+
+                <div class="space-y-2 text-xs text-slate-600">
+                  <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="text-slate-500">Acoustic Pitch Range:</span>
+                    <span class="font-semibold text-slate-800">142 Hz (Consistent)</span>
+                  </div>
+                  <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="text-slate-500">Semantic Coherence:</span>
+                    <span class="font-semibold text-slate-800">92% match</span>
+                  </div>
+                  <div class="flex justify-between py-1">
+                    <span class="text-slate-500">MindPlay Response Latency:</span>
+                    <span class="font-semibold text-amber-600">+1.2s vs average</span>
+                  </div>
+                </div>
+              </div>
+
+              <button data-page="ai-insights" class="mt-6 w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition flex items-center justify-center space-x-1">
+                <span>View Insight Breakdown</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- THREE COMPACT SIGNAL CARDS -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-md flex items-center justify-between">
+              <div>
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">VOICE PATTERN</span>
+                <h4 class="text-xl font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+                  Consistent
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                </h4>
+                <p class="text-xs text-slate-500 mt-0.5">Tempo: 128 wpm · Normal pitch curve</p>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                🎙️
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-md flex items-center justify-between">
+              <div>
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">STORY RECALL</span>
+                <h4 class="text-xl font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+                  4 / 5 <span class="text-xs font-medium text-slate-500">Elements</span>
+                </h4>
+                <p class="text-xs text-slate-500 mt-0.5">Key narrative anchors recalled</p>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold">
+                📖
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-md flex items-center justify-between">
+              <div>
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">MINDPLAY</span>
+                <h4 class="text-xl font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+                  92% <span class="text-xs font-medium text-slate-500">Accuracy</span>
+                </h4>
+                <p class="text-xs text-slate-500 mt-0.5">Completion time: 1 min 12 sec</p>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl font-bold">
+                🎮
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/navigation.js"></script>
+</body>
+</html>

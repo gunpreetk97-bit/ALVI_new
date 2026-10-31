@@ -1,0 +1,56 @@
+# ──────────────────────────────────────────────
+# ALVI — .gitignore
+# ──────────────────────────────────────────────
+
+# ── Environment & Secrets ──────────────────────
+.env
+.env.*
+.env.local
+.env.production
+*.key
+*.pem
+*.p12
+*.pfx
+*.secret
+*.credentials
+secrets/
+
+# ── Dependencies ───────────────────────────────
+node_modules/
+bower_components/
+vendor/
+package-lock.json
+yarn.lock
+
+# ── Python (if added later) ────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# ── IDE / Editor ───────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── OS Generated ──────────────────────────────
+*.tmp
+*.temp
+*.log
+*.bak
+*.cache
+
+# ── Build Outputs ─────────────────────────────
+*.min.js
+*.min.css
+*.map
