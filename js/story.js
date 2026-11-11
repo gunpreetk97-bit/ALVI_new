@@ -76,6 +76,81 @@ document.addEventListener('DOMContentLoaded', () => {
   let recordedChunks = [];
   let playbackURL    = null;
 
+  // NEW FRONTEND-ONLY IMPLEMENTATION: Browser Speech-to-Text & Fact Scoring State
+  let recognition = null;
+  let liveTranscript = '';
+
+  const STORY_FACT_RULES = [
+    { id: 'aarav', label: 'Aarav (Protagonist)', regex: /\b(aarav|arav|arrav|aurav|the boy|the man)\b/i },
+    { id: 'rain', label: 'Rainy morning', regex: /\b(rain|rainy|raining|storm)\b/i },
+    { id: 'umbrella', label: 'Blue umbrella', regex: /\b(umbrella|parasol)\b/i },
+    { id: 'market', label: 'Local market', regex: /\b(market|shop|store|bazaar)\b/i },
+    { id: 'apples', label: 'Bought three red apples', regex: /\b(apple|apples|fruit)\b/i },
+    { id: 'meera', label: 'Met friend Meera', regex: /\b(meera|mira|his friend|a friend|friend)\b/i },
+    { id: 'gave', label: 'Gave her one apple', regex: /\b(gave|give|shared|gifted|handed)\b/i },
+    { id: 'home', label: 'Returned home', regex: /\b(home|returned|came back|went back)\b/i }
+  ];
+
+  function scoreStoryRecall(transcriptText, timingSeconds, inputMode = 'voice') {
+    const text = (transcriptText || '').trim();
+    const recalled = [];
+    const missed = [];
+
+    STORY_FACT_RULES.forEach(fact => {
+      if (fact.regex.test(text)) {
+        recalled.push(fact.label);
+      } else {
+        missed.push(fact.label);
+      }
+    });
+
+    const scorePercent = Math.round((recalled.length / STORY_FACT_RULES.length) * 100);
+
+    const scoreCard = document.getElementById('fact-scoring-card');
+    const scoreHeading = document.getElementById('fact-score-heading');
+    const scoreBadge = document.getElementById('fact-score-badge');
+    const recalledList = document.getElementById('facts-recalled-list');
+    const missedList = document.getElementById('facts-missed-list');
+
+    if (scoreHeading) scoreHeading.textContent = `Score: ${recalled.length} / ${STORY_FACT_RULES.length} Facts Recalled (${scorePercent}%)`;
+    if (scoreBadge) {
+      scoreBadge.textContent = scorePercent + '%';
+      scoreBadge.className = scorePercent >= 75
+        ? 'text-xs font-bold px-3 py-1 rounded-full bg-emerald-600 text-white'
+        : (scorePercent >= 50
+          ? 'text-xs font-bold px-3 py-1 rounded-full bg-amber-600 text-white'
+          : 'text-xs font-bold px-3 py-1 rounded-full bg-purple-600 text-white');
+    }
+
+    if (recalledList) {
+      recalledList.innerHTML = recalled.length > 0
+        ? recalled.map(f => `<li class="flex items-center gap-1.5 font-semibold text-emerald-700"><span>✓</span><span>${f}</span></li>`).join('')
+        : '<li class="italic text-slate-400">No key facts detected</li>';
+    }
+
+    if (missedList) {
+      missedList.innerHTML = missed.length > 0
+        ? missed.map(f => `<li class="flex items-center gap-1.5 text-slate-500"><span>✗</span><span>${f}</span></li>`).join('')
+        : '<li class="italic text-emerald-600 font-semibold">All 8 key facts recalled!</li>';
+    }
+
+    if (scoreCard) scoreCard.classList.remove('hidden');
+
+    if (window.ALVI && window.ALVI.session) {
+      window.ALVI.session.saveStory({
+        completed: true,
+        durationSeconds: timingSeconds || 20,
+        transcript: text,
+        recalled_facts: recalled,
+        missed_facts: missed,
+        score_percent: scorePercent,
+        input_mode: inputMode
+      });
+    }
+
+    return { recalled, missed, scorePercent };
+  }
+
   // ── Playback element (injected into the dark recording panel) ─────────────
   const playbackContainer = document.createElement('div');
   playbackContainer.id    = 'story-playback-container';
@@ -190,6 +265,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
       dataArray = new Uint8Array(analyser.frequencyBinCount);
 
+      // NEW FRONTEND-ONLY IMPLEMENTATION: Browser speech-to-text
+      liveTranscript = '';
+      const transcriptEl = document.getElementById('stt-transcript-text');
+      if (transcriptEl) {
+        transcriptEl.textContent = 'Listening to retell… Speak clearly.';
+        transcriptEl.className = 'text-xs text-purple-600 font-semibold animate-pulse';
+      }
+
+      if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        try {
+          const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+          recognition = new SpeechRec();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US';
+
+          recognition.onresult = (evt) => {
+            let str = '';
+            for (let i = 0; i < evt.results.length; i++) {
+              str += evt.results[i][0].transcript + ' ';
+            }
+            liveTranscript = str.trim();
+            if (transcriptEl) {
+              transcriptEl.textContent = liveTranscript || 'Listening…';
+              transcriptEl.className = 'text-xs text-slate-800 font-medium';
+            }
+          };
+          recognition.start();
+        } catch (_) {}
+      }
+
       // MediaRecorder for playback blob
       recordedChunks = [];
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -201,6 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.data && e.data.size > 0) recordedChunks.push(e.data);
       };
 
+      // OLD BACKEND CODE — PRESERVED
+      // Previous simple duration save without speech transcription or transparent rule scoring
+      /*
       mediaRecorder.onstop = () => {
         if (recordedChunks.length > 0) {
           const blob = new Blob(recordedChunks, { type: mimeType });
@@ -212,17 +321,35 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           playbackContainer.classList.remove('hidden');
 
-          // ── Session: mark Story Recall as completed.
-          // Saved here — inside onstop — only after MediaRecorder has
-          // genuinely finished and the Blob is confirmed non-empty.
-          // storyElapsed holds the actual number of seconds recorded.
-          // No audio data or Blob URLs are written to sessionStorage.
           if (window.ALVI && window.ALVI.session) {
             window.ALVI.session.saveStory({
               completed:       true,
               durationSeconds: storyElapsed
             });
           }
+        }
+      };
+      */
+
+      // NEW FRONTEND-ONLY IMPLEMENTATION: Save to IndexedDB & evaluate transparent fact matching
+      mediaRecorder.onstop = async () => {
+        if (recordedChunks.length > 0) {
+          const blob = new Blob(recordedChunks, { type: mimeType });
+          if (playbackURL) URL.revokeObjectURL(playbackURL);
+          playbackURL = URL.createObjectURL(blob);
+          if (playbackAudio) {
+            playbackAudio.src = playbackURL;
+            playbackAudio.load();
+          }
+          playbackContainer.classList.remove('hidden');
+
+          if (window.ALVI && window.ALVI.storage) {
+            await window.ALVI.storage.saveAudio('story_judge', blob, { duration: storyElapsed });
+          }
+
+          const typedInput = document.getElementById('typed-retell-input');
+          const textToScore = liveTranscript || (typedInput ? typedInput.value : '');
+          scoreStoryRecall(textToScore, storyElapsed, 'voice');
         }
       };
 
@@ -266,6 +393,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
 
+    // Stop Speech Recognition if active
+    if (recognition) {
+      try { recognition.stop(); } catch (_) {}
+      recognition = null;
+    }
+
     if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
 
     if (micSource) { try { micSource.disconnect(); } catch (_) {} micSource = null; }
@@ -288,6 +421,39 @@ document.addEventListener('DOMContentLoaded', () => {
     recordStoryBtn.addEventListener('click', () => {
       if (!isRecordingStory) startStoryRecording();
       else                   stopStoryRecording();
+    });
+  }
+
+  // NEW FRONTEND-ONLY IMPLEMENTATION: Typed Fallback Controls
+  const toggleTypedBtn = document.getElementById('toggle-typed-fallback-btn');
+  const typedContainer = document.getElementById('typed-fallback-container');
+  const sttContainer = document.getElementById('stt-live-container');
+  const scoreTypedBtn = document.getElementById('score-typed-retell-btn');
+  const typedInput = document.getElementById('typed-retell-input');
+
+  if (toggleTypedBtn && typedContainer) {
+    toggleTypedBtn.addEventListener('click', () => {
+      const isHidden = typedContainer.classList.contains('hidden');
+      if (isHidden) {
+        typedContainer.classList.remove('hidden');
+        if (sttContainer) sttContainer.classList.add('hidden');
+        toggleTypedBtn.textContent = '🎙️ Switch to Voice Recording';
+      } else {
+        typedContainer.classList.add('hidden');
+        if (sttContainer) sttContainer.classList.remove('hidden');
+        toggleTypedBtn.textContent = '⌨️ Switch to Typed Retell';
+      }
+    });
+  }
+
+  if (scoreTypedBtn && typedInput) {
+    scoreTypedBtn.addEventListener('click', () => {
+      const text = typedInput.value;
+      if (!text || text.trim().length === 0) {
+        alert('Please type what you remember from the story before evaluating.');
+        return;
+      }
+      scoreStoryRecall(text, 25, 'typed');
     });
   }
 

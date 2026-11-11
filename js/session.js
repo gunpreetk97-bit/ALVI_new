@@ -58,19 +58,29 @@ window.ALVI = window.ALVI || {};
 
   // Default blank template — ensures every key always exists even if an
   // activity was skipped, so results.js can safely read any field.
+  // NEW FRONTEND-ONLY IMPLEMENTATION — Extended with acoustic features, story fact matching, and case comparison mode
   function blankSession() {
     return {
       sessionId:  generateId(),
       startedAt:  new Date().toISOString(),
+      activeCaseId: 'LIVE_JUDGE', // 'LIVE_JUDGE' | 'HC01'..'HC10' | 'AD01'..'AD05'
 
       voice: {
         completed:       false,
-        durationSeconds: 0
+        durationSeconds: 0,
+        isValid:         true,
+        rejectionReason: null,
+        features:        null // { rms, zcr, duration, pause_ratio, pause_count, pause_seconds, spectral_centroid }
       },
 
       story: {
         completed:       false,
-        durationSeconds: 0
+        durationSeconds: 0,
+        transcript:      '',
+        recalled_facts:  [],
+        missed_facts:    [],
+        score_percent:   0,
+        input_mode:      'voice'
       },
 
       mindplay: {
@@ -80,7 +90,8 @@ window.ALVI = window.ALVI || {};
         ch2_correct:     false,
         ch3_correct:     false,
         ch3_reactionMs:  null,
-        completed:       false
+        completed:       false,
+        total_time_seconds: 0
       }
     };
   }
@@ -179,21 +190,32 @@ window.ALVI = window.ALVI || {};
    * Example (on "Continue" without recording):
    *   ALVI.session.saveVoice({ completed: false, durationSeconds: 0 });
    */
-  function saveVoice({ completed = false, durationSeconds = 0 } = {}) {
-    _merge({ voice: { completed, durationSeconds } });
+  // NEW FRONTEND-ONLY IMPLEMENTATION: support acoustic features, validation & rejection reasons
+  function saveVoice({ completed = false, durationSeconds = 0, isValid = true, rejectionReason = null, features = null } = {}) {
+    _merge({
+      voice: {
+        completed,
+        durationSeconds,
+        isValid,
+        rejectionReason,
+        features
+      }
+    });
   }
 
-  /**
-   * saveStory({ completed, durationSeconds })
-   *
-   * Call this when Story Recall recording finishes.
-   * Does not affect voice or mindplay data.
-   *
-   * Example (on stopStoryRecording in story.js):
-   *   ALVI.session.saveStory({ completed: true, durationSeconds: storyElapsed });
-   */
-  function saveStory({ completed = false, durationSeconds = 0 } = {}) {
-    _merge({ story: { completed, durationSeconds } });
+  // NEW FRONTEND-ONLY IMPLEMENTATION: support transcript, fact match arrays, and score
+  function saveStory({ completed = false, durationSeconds = 0, transcript = '', recalled_facts = [], missed_facts = [], score_percent = 0, input_mode = 'voice' } = {}) {
+    _merge({
+      story: {
+        completed,
+        durationSeconds,
+        transcript,
+        recalled_facts,
+        missed_facts,
+        score_percent,
+        input_mode
+      }
+    });
   }
 
   /**
@@ -259,6 +281,16 @@ window.ALVI = window.ALVI || {};
     init();
   }
 
+  // NEW FRONTEND-ONLY IMPLEMENTATION: Case Comparison active selector
+  function setActiveCase(caseId) {
+    _merge({ activeCaseId: caseId });
+  }
+
+  function getActiveCase() {
+    const s = get();
+    return s.activeCaseId || 'LIVE_JUDGE';
+  }
+
   // ── Expose on window.ALVI.session ──────────────────────────────────────────
   window.ALVI.session = {
     init,
@@ -266,7 +298,9 @@ window.ALVI = window.ALVI || {};
     saveVoice,
     saveStory,
     saveMindplay,
-    reset
+    reset,
+    setActiveCase,
+    getActiveCase
   };
 
 })();

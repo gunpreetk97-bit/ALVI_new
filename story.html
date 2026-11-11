@@ -81,6 +81,11 @@
             <span>MindPlay</span>
           </button>
 
+          <button data-page="results" class="nav-item flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">📊</span>
+            <span>Case Comparison</span>
+          </button>
+
           <div class="pt-3 pb-1 px-3">
             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Analytics & History</p>
           </div>
@@ -199,6 +204,59 @@
                   <span id="story-record-status" class="text-xs text-slate-400">Press to start recording story retell.</span>
                 </div>
               </div>
+
+              <!-- NEW FRONTEND-ONLY IMPLEMENTATION: Live Speech-to-Text & Typed Fallback Section -->
+              <div class="space-y-3 pt-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>📝</span> Recalled Story Content
+                  </span>
+                  <button id="toggle-typed-fallback-btn" class="text-xs text-purple-600 hover:text-purple-700 font-semibold underline transition">
+                    ⌨️ Switch to Typed Retell
+                  </button>
+                </div>
+
+                <!-- Speech Recognition Live Transcript Container -->
+                <div id="stt-live-container" class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 min-h-[52px]">
+                  <span class="text-slate-400 italic" id="stt-transcript-text">Live transcript will appear here as you speak (Browser Speech Recognition), or use typed fallback.</span>
+                </div>
+
+                <!-- Typed Fallback Textarea (Toggled) -->
+                <div id="typed-fallback-container" class="hidden space-y-2">
+                  <textarea id="typed-retell-input" rows="3" class="w-full p-3 rounded-xl border border-slate-300 text-xs text-slate-900 focus:ring-2 focus:ring-purple-500 focus:outline-none" placeholder="Type what you remember from Aarav's story..."></textarea>
+                  <div class="flex justify-end">
+                    <button id="score-typed-retell-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                      Evaluate Retell
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Transparent Fact Scoring Breakdown -->
+                <div id="fact-scoring-card" class="hidden p-4 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">Transparent Fact Matching · Aarav v1.0</span>
+                      <h4 id="fact-score-heading" class="text-base font-extrabold text-slate-900 mt-1">Score: 0 / 8 Facts Recalled (0%)</h4>
+                    </div>
+                    <span id="fact-score-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-purple-600 text-white">0%</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                    <div>
+                      <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mb-1">✓ Recalled Facts:</p>
+                      <ul id="facts-recalled-list" class="space-y-1 text-emerald-700">
+                        <li class="italic text-slate-400">None yet</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">✗ Missed Facts:</p>
+                      <ul id="facts-missed-list" class="space-y-1 text-slate-500">
+                        <li class="italic text-slate-400">None yet</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="flex justify-between items-center pt-2">
@@ -219,6 +277,9 @@
 
   <script src="js/app.js"></script>
   <script src="js/navigation.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio_analysis.js"></script>
+  <script src="js/dataset.js"></script>
   <script src="js/session.js"></script>
   <script src="js/story.js"></script>
 </body>

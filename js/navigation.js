@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'ai-analysis': 'analysis.html',
     'analysis': 'analysis.html',
     'results': 'results.html',
+    'case-comparison': 'results.html',
     'cognitive-journey': 'journey.html',
     'journey': 'journey.html',
     'pattern-explorer': 'patterns.html',

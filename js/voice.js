@@ -182,6 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.data && e.data.size > 0) recordedChunks.push(e.data);
       };
 
+      // OLD BACKEND CODE — PRESERVED
+      // Previously, voice recording only tracked elapsed duration without extracting actual acoustic features:
+      /*
       mediaRecorder.onstop = () => {
         if (recordedChunks.length > 0) {
           const blob = new Blob(recordedChunks, { type: mimeType });
@@ -193,16 +196,21 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           playbackContainer.classList.remove('hidden');
 
-          // ── Session: mark Voice Description as completed.
-          // Saved here — inside onstop — so we only record completion
-          // after MediaRecorder has genuinely finished collecting data.
-          // voiceElapsedSeconds holds the actual recorded duration.
           if (window.ALVI && window.ALVI.session) {
             window.ALVI.session.saveVoice({
               completed:       true,
               durationSeconds: voiceElapsedSeconds
             });
           }
+        }
+      };
+      */
+
+      // NEW FRONTEND-ONLY IMPLEMENTATION: Real Web Audio extraction, silence/validity rejection & IndexedDB caching
+      mediaRecorder.onstop = async () => {
+        if (recordedChunks.length > 0) {
+          const blob = new Blob(recordedChunks, { type: mimeType });
+          await handleCapturedAudioBlob(blob, voiceElapsedSeconds);
         }
       };
 
@@ -319,6 +327,107 @@ document.addEventListener('DOMContentLoaded', () => {
     drawIdle();
   }
 
+  // ── NEW FRONTEND-ONLY IMPLEMENTATION: Audio analysis, validation & storage ──
+  async function handleCapturedAudioBlob(blob, fallbackDuration) {
+    if (playbackURL) URL.revokeObjectURL(playbackURL);
+    playbackURL = URL.createObjectURL(blob);
+    if (playbackAudio) {
+      playbackAudio.src = playbackURL;
+      playbackAudio.load();
+    }
+    playbackContainer.classList.remove('hidden');
+
+    // Save audio into local IndexedDB
+    if (window.ALVI && window.ALVI.storage) {
+      await window.ALVI.storage.saveAudio('voice_judge', blob, { duration: fallbackDuration });
+    }
+
+    // Extract actual acoustic features via Web Audio API
+    if (window.ALVI && window.ALVI.audioAnalysis) {
+      try {
+        if (recordStatusText) {
+          recordStatusText.textContent = 'Extracting acoustic features (ZCR, RMS, Pauses, Centroid)…';
+          recordStatusText.className = 'text-xs text-indigo-400 font-semibold animate-pulse';
+        }
+
+        const audioBuffer = await window.ALVI.audioAnalysis.decodeAudioBlob(blob);
+        const analysis = window.ALVI.audioAnalysis.analyzeAudioBuffer(audioBuffer);
+
+        const metricsContainer = document.getElementById('voice-feature-metrics');
+        const metricRms = document.getElementById('metric-rms');
+        const metricZcr = document.getElementById('metric-zcr');
+        const metricPause = document.getElementById('metric-pause');
+        const metricCentroid = document.getElementById('metric-centroid');
+
+        if (!analysis.isValid) {
+          // Reject silent/invalid recordings
+          if (recordStatusText) {
+            recordStatusText.textContent = '⚠️ ' + analysis.reason;
+            recordStatusText.className = 'text-xs text-rose-400 font-semibold';
+          }
+          if (metricsContainer) metricsContainer.classList.add('hidden');
+
+          if (window.ALVI && window.ALVI.session) {
+            window.ALVI.session.saveVoice({
+              completed: false,
+              durationSeconds: analysis.duration || fallbackDuration,
+              isValid: false,
+              rejectionReason: analysis.reason,
+              features: null
+            });
+          }
+          return;
+        }
+
+        // Valid recording - populate empirical metrics
+        if (metricRms) metricRms.textContent = analysis.rms.toFixed(4);
+        if (metricZcr) metricZcr.textContent = analysis.zcr.toFixed(4);
+        if (metricPause) metricPause.textContent = (analysis.pause_ratio * 100).toFixed(0) + '%';
+        if (metricCentroid) metricCentroid.textContent = analysis.spectral_centroid + ' Hz';
+        if (metricsContainer) metricsContainer.classList.remove('hidden');
+
+        if (recordStatusText) {
+          recordStatusText.textContent = `✓ Speech acoustic features extracted: ${analysis.duration}s duration, ${analysis.pause_count} pauses (${(analysis.pause_ratio * 100).toFixed(0)}% pause time).`;
+          recordStatusText.className = 'text-xs text-emerald-400 font-bold';
+        }
+
+        if (window.ALVI && window.ALVI.session) {
+          window.ALVI.session.saveVoice({
+            completed: true,
+            durationSeconds: analysis.duration,
+            isValid: true,
+            rejectionReason: null,
+            features: {
+              duration: analysis.duration,
+              rms: analysis.rms,
+              zcr: analysis.zcr,
+              pause_ratio: analysis.pause_ratio,
+              pause_count: analysis.pause_count,
+              pause_seconds: analysis.pause_seconds,
+              spectral_centroid: analysis.spectral_centroid,
+              phonation_ratio: analysis.phonation_ratio
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Audio analysis error:', err);
+        if (window.ALVI && window.ALVI.session) {
+          window.ALVI.session.saveVoice({
+            completed: true,
+            durationSeconds: fallbackDuration || 20
+          });
+        }
+      }
+    } else {
+      if (window.ALVI && window.ALVI.session) {
+        window.ALVI.session.saveVoice({
+          completed: true,
+          durationSeconds: fallbackDuration || 20
+        });
+      }
+    }
+  }
+
   // ── Button wiring ─────────────────────────────────────────────────────────
   if (toggleRecordBtn) {
     toggleRecordBtn.addEventListener('click', () => {
@@ -329,6 +438,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (resetRecordBtn) {
     resetRecordBtn.addEventListener('click', resetRecording);
+  }
+
+  // NEW FRONTEND-ONLY IMPLEMENTATION: Audio File Import
+  const importVoiceInput = document.getElementById('import-voice-audio-input');
+  if (importVoiceInput) {
+    importVoiceInput.addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (resetRecordBtn) resetRecordBtn.classList.remove('hidden');
+      if (recordStatusText) {
+        recordStatusText.textContent = `Importing "${file.name}"…`;
+        recordStatusText.className = 'text-xs text-indigo-400 font-semibold';
+      }
+      await handleCapturedAudioBlob(file, 20);
+    });
   }
 
   if (toStoryRecallBtn) {

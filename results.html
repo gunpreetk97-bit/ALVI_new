@@ -36,6 +36,9 @@
   
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/results.css">
+  
+  <!-- Chart.js for Benchmark Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="font-sans antialiased text-slate-900 bg-slate-50 h-full flex overflow-hidden">
 
@@ -79,6 +82,11 @@
           <button data-page="mindplay" class="nav-item flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
             <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">🎮</span>
             <span>MindPlay</span>
+          </button>
+
+          <button data-page="results" class="nav-item active flex items-center w-full px-3.5 py-3 text-sm font-medium rounded-xl transition-all duration-200 group">
+            <span class="w-7 h-7 rounded-lg flex items-center justify-center mr-3 text-base group-hover:scale-110 transition-transform">📊</span>
+            <span>Case Comparison</span>
           </button>
 
           <div class="pt-3 pb-1 px-3">
@@ -150,14 +158,126 @@
 
       <div id="pages-container" class="p-8 flex-1 max-w-7xl w-full mx-auto">
 
-        <!-- RESULTS SECTION -->
-        <section id="page-results" class="page-view space-y-8 max-w-4xl mx-auto">
-          <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+        <!-- RESULTS & CASE COMPARISON SECTION -->
+        <section id="page-results" class="page-view space-y-6 max-w-5xl mx-auto">
+          <!-- TOP HEADER & CONTROLS -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 gap-3">
             <div>
-              <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Completed Check-in</span>
-              <h1 class="text-3xl font-extrabold text-slate-900 mt-2">Today's ALVI Snapshot</h1>
+              <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">Assessment & Benchmark</span>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">ALVI Case Comparison & Results</h1>
             </div>
-            <span id="results-date" class="text-xs font-semibold text-slate-500">Date: Today</span>
+            <div class="flex items-center space-x-2">
+              <button id="export-json-btn" title="Export session results as JSON" class="px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700 flex items-center space-x-1.5 transition">
+                <span>💾</span> <span>Export JSON</span>
+              </button>
+              <label title="Import session JSON" class="cursor-pointer px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700 flex items-center space-x-1.5 transition">
+                <span>📂</span> <span>Import JSON</span>
+                <input type="file" id="import-json-input" accept=".json,application/json" class="hidden">
+              </label>
+              <span id="results-date" class="text-xs font-semibold text-slate-500 hidden sm:inline ml-2">Date: Today</span>
+            </div>
+          </div>
+
+          <!-- NEW FRONTEND-ONLY IMPLEMENTATION: Case Comparison Mode Selector -->
+          <div class="bg-white rounded-2xl p-3 border border-slate-200/90 shadow-sm flex flex-wrap items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 px-2">Compare:</span>
+            
+            <button data-case-btn="LIVE_JUDGE" class="case-mode-btn active px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 bg-indigo-600 text-white shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>🔴 Live Assessment</span>
+            </button>
+
+            <div class="flex items-center space-x-1 bg-slate-100 rounded-xl px-2 py-1 border border-slate-200">
+              <button data-case-btn="REFERENCE" class="case-mode-btn px-2.5 py-1 text-xs font-bold text-slate-700 hover:text-indigo-600 transition">
+                <span>🟢 Reference Cohort:</span>
+              </button>
+              <select id="reference-volunteer-select" class="text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                <option value="HC01" selected>HC01 (Age 64)</option>
+                <option value="HC02">HC02 (Age 59)</option>
+                <option value="HC03">HC03 (Age 68)</option>
+                <option value="HC04">HC04 (Age 71)</option>
+                <option value="HC05">HC05 (Age 61)</option>
+                <option value="HC06">HC06 (Age 66)</option>
+                <option value="HC07">HC07 (Age 73)</option>
+                <option value="HC08">HC08 (Age 63)</option>
+                <option value="HC09">HC09 (Age 67)</option>
+                <option value="HC10">HC10 (Age 60)</option>
+              </select>
+            </div>
+
+            <!-- 5 Alzheimer's Disease Cases in One Unified Dropdown Bar -->
+            <div class="flex items-center space-x-1 bg-amber-50 rounded-xl px-2.5 py-1 border border-amber-200 shadow-sm">
+              <button data-case-btn="ALZHEIMERS" class="case-mode-btn px-2.5 py-1 text-xs font-bold text-amber-900 hover:text-amber-700 transition flex items-center space-x-1">
+                <span>🧠</span>
+                <span>Alzheimer's Cases:</span>
+              </button>
+              <select id="alzheimers-case-select" class="text-xs font-semibold bg-white border border-amber-300 rounded-lg px-2.5 py-1 text-amber-950 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer">
+                <option value="AD01" selected>AD01 — Mild Stage (Early Cognitive Impairment)</option>
+                <option value="AD02">AD02 — Moderate Stage (MindPlay Uncollected)</option>
+                <option value="AD03">AD03 — Mild-to-Moderate Stage</option>
+                <option value="AD04">AD04 — Early Amnestic Presentation</option>
+                <option value="AD05">AD05 — Advanced Stage (Severe Multi-Domain Decline)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PROMINENT SIMULATED DEMO BANNER (Displayed for AD01–AD05) -->
+          <div id="simulated-case-banner" class="hidden p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 text-amber-950 flex items-start space-x-3 shadow-sm">
+            <span class="text-2xl mt-0.5">⚠️</span>
+            <div>
+              <p class="text-xs font-black tracking-wider uppercase text-amber-700">SIMULATED DEMO — NOT A REAL PATIENT</p>
+              <p class="text-xs text-amber-900 mt-0.5">
+                This case walkthrough demonstrates cognitive variation using fictional benchmark parameters. It is an educational demonstration only and is <strong>never presented as a real clinical record or medical diagnosis</strong>.
+              </p>
+            </div>
+          </div>
+
+          <!-- CASE PROVENANCE & METADATA CARD -->
+          <div id="case-provenance-card" class="bg-white rounded-3xl p-5 border border-slate-200 shadow-md space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+              <div>
+                <span id="case-type-badge" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
+                  Live Participant Assessment
+                </span>
+                <h3 id="case-title" class="text-lg font-extrabold text-slate-900 mt-1">Live Participant Session</h3>
+              </div>
+              <div id="case-tasks-available" class="flex items-center gap-1.5 text-[11px] font-semibold">
+                <!-- Badges populated dynamically -->
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600">
+              <div>
+                <span class="text-slate-400 font-bold block text-[10px] uppercase">Data Source:</span>
+                <span id="case-source-text" class="font-medium text-slate-800">Current live browser interaction</span>
+              </div>
+              <div>
+                <span class="text-slate-400 font-bold block text-[10px] uppercase">Consent / License:</span>
+                <span id="case-consent-text" class="font-medium text-slate-800">Direct active evaluation</span>
+              </div>
+              <div>
+                <span class="text-slate-400 font-bold block text-[10px] uppercase">Task Protocol:</span>
+                <span id="case-protocol-text" class="font-medium text-slate-800">Aarav Story v1.0 / Park Scene v1.0 / MindPlay Tri-Challenge v1.0</span>
+              </div>
+            </div>
+
+            <!-- AUDIO PLAYBACK & AUTHORIZATION WIDGET -->
+            <div id="case-audio-container" class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm">🔊</span>
+                <span id="audio-auth-status" class="font-semibold text-slate-700">Audio Playback:</span>
+                <audio id="case-audio-player" controls class="h-8 max-w-[240px] hidden"></audio>
+                <span id="audio-privacy-msg" class="text-slate-500 italic text-[11px]"></span>
+              </div>
+
+              <!-- Prerecorded Audio Import for AD Examples -->
+              <div class="flex items-center space-x-2">
+                <label id="upload-case-audio-label" class="cursor-pointer text-[11px] font-bold text-indigo-600 hover:text-indigo-800 transition flex items-center space-x-1">
+                  <span>📥 Import Audio Sample</span>
+                  <input type="file" id="upload-case-audio-input" accept="audio/*" class="hidden">
+                </label>
+              </div>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -185,7 +305,7 @@
               <h3 id="story-status" class="text-xl font-bold text-slate-900">—</h3>
               <p id="story-detail" class="text-xs text-slate-500 mt-1">Awaiting AI analysis</p>
               <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Recording duration</span>
+                <span>Recall accuracy</span>
                 <span id="story-duration" class="text-indigo-600 font-semibold">—</span>
               </div>
             </div>
@@ -220,21 +340,257 @@
 
           </div>
 
+          <!-- DETAILED BENCHMARK COMPARISON SECTION -->
+          <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xl space-y-6">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">Biomarker Distribution</span>
+                <h3 class="text-xl font-extrabold text-slate-900 mt-1">Multi-Modal Cognitive &amp; Acoustic Analysis</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Objective comparison against normative baseline medians, Interquartile Ranges (IQR [25% - 75%]), and boundary thresholds.</p>
+              </div>
+              <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                Standard Normative Reference
+              </span>
+            </div>
+
+            <!-- TABULAR COMPARISON METRICS -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
+                    <th class="py-2.5 px-3">Assessment Signal</th>
+                    <th class="py-2.5 px-3">Current Case Value</th>
+                    <th class="py-2.5 px-3">Reference Median</th>
+                    <th class="py-2.5 px-3">Reference Range [Q1 – Q3]</th>
+                    <th class="py-2.5 px-3">Comparison Status</th>
+                  </tr>
+                </thead>
+                <tbody id="benchmark-metrics-tbody" class="divide-y divide-slate-100 text-slate-700">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- VISUAL COMPARISON CHART -->
+            <div class="pt-4 border-t border-slate-100">
+              <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">Multi-Modal Distribution Overview</h4>
+              <div class="h-64 relative">
+                <canvas id="comparisonChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- NEW FRONTEND-ONLY IMPLEMENTATION: ALZHEIMER'S DISEASE RISK & LIKELIHOOD ASSESSMENT -->
+          <div id="ad-risk-assessment-section" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">
+                  Risk &amp; Probability Analysis
+                </span>
+                <h3 class="text-2xl font-black text-slate-900 mt-1">Alzheimer's Disease Risk &amp; Likelihood Assessment</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Multi-factor projection based on acoustic hesitation, episodic retrieval deficit, and reaction latency signals.</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span id="ad-risk-tier-badge" class="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-sm">
+                  Low Risk
+                </span>
+              </div>
+            </div>
+
+            <!-- CHANCES / PROBABILITY HERO METRIC & PROGRESSION SPECTRUM -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center bg-slate-50 rounded-2xl p-6 border border-slate-200/80">
+              <div class="text-center lg:text-left space-y-1">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Estimated Alzheimer's Likelihood</span>
+                <div class="flex items-baseline justify-center lg:justify-start space-x-2">
+                  <span id="ad-probability-percent" class="text-5xl font-black text-slate-900 font-mono tracking-tight">12%</span>
+                  <span class="text-sm font-bold text-slate-500">Probability / Chance</span>
+                </div>
+                <p id="ad-probability-category" class="text-xs font-bold text-emerald-700">Low Probability of Neurodegenerative Decline</p>
+              </div>
+
+              <!-- RISK PROGRESSION SPECTRUM BAR -->
+              <div class="lg:col-span-2 space-y-2">
+                <div class="flex justify-between text-[11px] font-bold text-slate-500 px-1">
+                  <span>0% (Low)</span>
+                  <span>25% (Mild)</span>
+                  <span>50% (Moderate)</span>
+                  <span>75% (Elevated)</span>
+                  <span>100% (High)</span>
+                </div>
+                <div class="h-4 w-full bg-slate-200 rounded-full overflow-hidden p-0.5 relative">
+                  <div class="h-full w-full rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 via-orange-500 to-rose-600 opacity-90"></div>
+                  <!-- Dynamic pin / indicator needle -->
+                  <div id="ad-risk-indicator-bar" class="absolute top-0 bottom-0 w-3 bg-white rounded-full border-2 border-slate-900 shadow-md transition-all duration-700" style="left: 12%;"></div>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-slate-400 px-1">
+                  <span class="text-emerald-700 font-semibold">● Typical Norm</span>
+                  <span class="text-amber-700 font-semibold">● Borderline Variance</span>
+                  <span class="text-rose-700 font-semibold">● Pathological Pattern</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- MULTI-MODAL RISK CONTRIBUTING FACTORS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Acoustic Factor -->
+              <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
+                    <span>🎙️</span>
+                    <span>Speech Pauses &amp; Fluency</span>
+                  </span>
+                  <span id="risk-acoustic-badge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Normal</span>
+                </div>
+                <p id="risk-acoustic-detail" class="text-xs text-slate-500 leading-relaxed">Speech pacing and acoustic pauses are within typical fluent limits.</p>
+              </div>
+
+              <!-- Memory Factor -->
+              <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
+                    <span>📖</span>
+                    <span>Episodic Memory Recall</span>
+                  </span>
+                  <span id="risk-memory-badge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Retained</span>
+                </div>
+                <p id="risk-memory-detail" class="text-xs text-slate-500 leading-relaxed">Target narrative anchors accurately retrieved without significant confabulation.</p>
+              </div>
+
+              <!-- Executive Reaction Factor -->
+              <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
+                    <span>🎮</span>
+                    <span>Executive Processing Latency</span>
+                  </span>
+                  <span id="risk-executive-badge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Agile</span>
+                </div>
+                <p id="risk-executive-detail" class="text-xs text-slate-500 leading-relaxed">Reaction latency and sequence reasoning demonstrate intact working memory.</p>
+              </div>
+            </div>
+
+            <!-- NEW: 12-BIOMARKER DIAGNOSTIC PARAMETER MATRIX & CONCORDANCE SAFEGUARD -->
+            <div class="border border-slate-200 rounded-2xl p-5 bg-slate-50/70 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center space-x-1">
+                    <span>🔬</span>
+                    <span>12-Biomarker Multi-Parametric Diagnostic Matrix</span>
+                  </span>
+                  <span id="rigor-badge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">
+                    High Specificity Rigor Active
+                  </span>
+                </div>
+                <div class="text-[11px] text-slate-500 font-medium">
+                  <span id="concordance-status" class="font-bold text-slate-700">Concordant Domains: 0 / 3 Deficient</span>
+                  <span class="text-slate-400">· Safeguard against false positives</span>
+                </div>
+              </div>
+
+              <!-- 12-Parameter Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs" id="biomarker-parameters-grid">
+                <!-- 1. Pause Ratio -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">1. Pause Ratio</span>
+                  <span id="param-pause-ratio" class="font-extrabold text-slate-800 text-sm">17.8%</span>
+                  <span id="param-pause-ratio-status" class="text-[10px] block font-semibold text-emerald-600">Within Norms</span>
+                </div>
+                <!-- 2. Pause Frequency -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">2. Hesitation Freq</span>
+                  <span id="param-pause-freq" class="font-extrabold text-slate-800 text-sm">4.5 / min</span>
+                  <span id="param-pause-freq-status" class="text-[10px] block font-semibold text-emerald-600">Fluent Pacing</span>
+                </div>
+                <!-- 3. Vocal Energy Stability -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">3. Vocal RMS Energy</span>
+                  <span id="param-rms" class="font-extrabold text-slate-800 text-sm">0.065</span>
+                  <span id="param-rms-status" class="text-[10px] block font-semibold text-emerald-600">Steady Amplitude</span>
+                </div>
+                <!-- 4. Spectral Centroid -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">4. Spectral Centroid</span>
+                  <span id="param-spectral" class="font-extrabold text-slate-800 text-sm">1,540 Hz</span>
+                  <span id="param-spectral-status" class="text-[10px] block font-semibold text-emerald-600">Clear Articulation</span>
+                </div>
+                <!-- 5. Episodic Fact Retention -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">5. Core Fact Recall</span>
+                  <span id="param-fact-retention" class="font-extrabold text-slate-800 text-sm">8 / 8 Facts</span>
+                  <span id="param-fact-retention-status" class="text-[10px] block font-semibold text-emerald-600">100% Retained</span>
+                </div>
+                <!-- 6. Narrative Chronology -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">6. Temporal Sequencing</span>
+                  <span id="param-chronology" class="font-extrabold text-slate-800 text-sm">Preserved</span>
+                  <span id="param-chronology-status" class="text-[10px] block font-semibold text-emerald-600">Intact Narrative Flow</span>
+                </div>
+                <!-- 7. Semantic Intrusion Resistance -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">7. Intrusion Confabulation</span>
+                  <span id="param-intrusion" class="font-extrabold text-slate-800 text-sm">0 Intrusions</span>
+                  <span id="param-intrusion-status" class="text-[10px] block font-semibold text-emerald-600">Zero Confabulation</span>
+                </div>
+                <!-- 8. Dual Memory Binding -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">8. Dual Memory Binding</span>
+                  <span id="param-dual-binding" class="font-extrabold text-slate-800 text-sm">2 / 2 Targets</span>
+                  <span id="param-dual-binding-status" class="text-[10px] block font-semibold text-emerald-600">Bound Working Memory</span>
+                </div>
+                <!-- 9. Sequence Transposition Inversions -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">9. Sequence Inversion</span>
+                  <span id="param-transposition" class="font-extrabold text-slate-800 text-sm">0 Inversions</span>
+                  <span id="param-transposition-status" class="text-[10px] block font-semibold text-emerald-600">Correct Order</span>
+                </div>
+                <!-- 10. Search Reaction Latency -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">10. Search Latency</span>
+                  <span id="param-latency" class="font-extrabold text-slate-800 text-sm">2,150 ms</span>
+                  <span id="param-latency-status" class="text-[10px] block font-semibold text-emerald-600">Agile Processing</span>
+                </div>
+                <!-- 11. Cross-Domain Concordance -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">11. Domain Concordance</span>
+                  <span id="param-concordance" class="font-extrabold text-slate-800 text-sm">0 / 3 Impaired</span>
+                  <span id="param-concordance-status" class="text-[10px] block font-semibold text-emerald-600">No Multi-System Concordance</span>
+                </div>
+                <!-- 12. Measurement Confidence Margin -->
+                <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">12. Margin of Error</span>
+                  <span id="param-margin" class="font-extrabold text-slate-800 text-sm">± 4.2%</span>
+                  <span id="param-margin-status" class="text-[10px] block font-semibold text-indigo-600">High Confidence Index</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CLINICAL INTERPRETATION & RECOMMENDATION -->
+            <div id="risk-guidance-container" class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-start space-x-3">
+              <span class="text-2xl mt-0.5">🧠</span>
+              <div class="space-y-1">
+                <h5 id="risk-guidance-title" class="text-xs font-extrabold text-indigo-950 uppercase tracking-wider">Clinical Guidance &amp; Interpretation</h5>
+                <p id="risk-guidance-text" class="text-xs text-indigo-900 leading-relaxed">
+                  Overall acoustic and memory markers show low statistical concordance with Alzheimer's speech and recall degradation profiles. Regular annual baseline monitoring recommended.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <!-- STATUS BANNER -->
           <div id="results-banner" class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
               <div class="space-y-2 max-w-xl">
                 <div class="inline-flex items-center space-x-2 bg-white/10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-indigo-200 border border-white/20">
                   <span class="w-2.5 h-2.5 rounded-full bg-indigo-300 animate-ping"></span>
-                  <span>Today's Check-in Summary</span>
+                  <span id="banner-tag">Session Summary</span>
                 </div>
                 <h2 id="banner-headline" class="text-3xl font-extrabold text-white tracking-tight">MindPlay: —</h2>
                 <p id="banner-subtext" class="text-indigo-100 text-sm leading-relaxed">Complete all three activities to see your full session summary.</p>
               </div>
 
               <div class="flex flex-col sm:flex-row gap-3 shrink-0">
-                <button data-page="ai-insights" class="px-5 py-3 bg-white text-indigo-950 hover:bg-indigo-50 font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center space-x-1">
-                  <span>🔍 Why am I seeing this?</span>
+                <button data-page="today-checkin" class="px-5 py-3 bg-white text-indigo-950 hover:bg-indigo-50 font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center space-x-1">
+                  <span>🎙️ Retake Check-in</span>
                 </button>
                 
                 <button data-page="cognitive-journey" class="px-5 py-3 bg-white/20 hover:bg-white/30 text-white font-bold rounded-xl text-xs border border-white/30 transition flex items-center justify-center space-x-1">
@@ -244,8 +600,14 @@
             </div>
           </div>
 
-          <div class="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center text-xs text-slate-500">
-            <p>ℹ️ <strong>Disclaimer:</strong> ALVI supports cognitive pattern monitoring and is not a diagnostic tool.</p>
+          <!-- CLINICAL SCREENING & ETHICAL NOTICE -->
+          <div class="space-y-2">
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950">
+              <p><strong>⚠️ Clinical Notice:</strong> This experimental cognitive evaluation system provides multi-modal risk estimation and comparative biomarker visualization. It is intended for observational screening and educational evaluation, not as a standalone medical diagnosis.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-xs text-slate-600">
+              <p>ℹ️ <strong>Professional Consultation:</strong> Comprehensive diagnostic evaluation requires clinical assessment (e.g. MMSE, MoCA), neurological examination, neuroimaging, and specialist consultation.</p>
+            </div>
           </div>
         </section>
 
@@ -255,6 +617,9 @@
 
   <script src="js/app.js"></script>
   <script src="js/navigation.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio_analysis.js"></script>
+  <script src="js/dataset.js"></script>
   <script src="js/session.js"></script>
   <script src="js/results.js"></script>
 </body>

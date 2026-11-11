@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const itemKey = card.getAttribute('data-item');
       if (selectedCh1Items.has(itemKey)) {
         selectedCh1Items.delete(itemKey);
-        card.classList.remove('selected');
+        card.classList.remove('selected', 'border-indigo-600', 'bg-indigo-50/80');
       } else {
         selectedCh1Items.add(itemKey);
-        card.classList.add('selected');
+        card.classList.add('selected', 'border-indigo-600', 'bg-indigo-50/80');
       }
     });
   });
@@ -110,6 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Pre-render sequence items so they are ready
+  renderSequenceItems();
+
   if (ch2BackBtn) {
     ch2BackBtn.addEventListener('click', () => {
       if (mindplayCh2) mindplayCh2.classList.add('hidden');
@@ -120,14 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (ch2NextBtn) {
     ch2NextBtn.addEventListener('click', () => {
       if (mindplayCh2) mindplayCh2.classList.add('hidden');
-      if (mindplayCh3) mindplayCh3.classList.remove('hidden');
+      if (mindplayCh3) {
+        mindplayCh3.classList.remove('hidden');
+        // NEW FRONTEND-ONLY IMPLEMENTATION: start reaction timer when Challenge 3 is visually displayed to the user
+        startFindTimer();
+      }
     });
   }
 
   // Challenge 3: Quick Find Timer
   let findTimerInterval = null;
   let findStartTime = null; // performance.now() timestamp when timer starts
-
 
   function startFindTimer() {
     findStartTime = performance.now();
@@ -140,21 +146,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
   }
 
-  // Start timer when challenge 3 becomes visible
-  if (mindplayCh3) startFindTimer();
-
   const findCards = document.querySelectorAll('.find-card');
   findCards.forEach(card => {
     card.addEventListener('click', () => {
       clearInterval(findTimerInterval);
       const item = card.getAttribute('data-find-item');
       findSelection = item;
-      findMs = performance.now() - findStartTime;
-      findCards.forEach(c => c.classList.remove('selected-correct', 'selected-incorrect'));
+      if (findStartTime !== null) {
+        findMs = performance.now() - findStartTime;
+      }
+      findCards.forEach(c => c.classList.remove('selected-correct', 'selected-incorrect', 'border-emerald-500', 'bg-emerald-50', 'border-rose-500', 'bg-rose-50'));
       if (item === 'umbrella') {
-        card.classList.add('selected-correct');
+        card.classList.add('selected-correct', 'border-emerald-500', 'bg-emerald-50');
       } else {
-        card.classList.add('selected-incorrect');
+        card.classList.add('selected-incorrect', 'border-rose-500', 'bg-rose-50');
       }
     });
   });
@@ -168,6 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (completeMindplayBtn) {
     completeMindplayBtn.addEventListener('click', () => {
+      clearInterval(findTimerInterval);
+      if (findMs === null && findStartTime !== null) {
+        findMs = performance.now() - findStartTime;
+      }
+
       // Compute scores based on real user interactions
       const correctItems = new Set(['umbrella', 'apples']);
       const ch1_selected = Array.from(selectedCh1Items);
@@ -175,7 +185,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const ch1_correct = ch1_score === 2 && selectedCh1Items.size === 2;
       const ch2_correct = currentSequence.every((item, idx) => item.correctOrder === idx + 1);
       const ch3_correct = findSelection === 'umbrella';
-      const ch3_reactionMs = findMs !== null ? findMs : null;
+      const ch3_reactionMs = findMs !== null ? Math.round(findMs) : null;
+      const totalElapsedMs = performance.now() - mindplayStartTime;
+      const totalSec = parseFloat((totalElapsedMs / 1000).toFixed(1));
+
       if (window.ALVI && window.ALVI.session) {
         window.ALVI.session.saveMindplay({
           ch1_selected,
@@ -184,7 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
           ch2_correct,
           ch3_correct,
           ch3_reactionMs,
-          completed: true
+          completed: true,
+          total_time_seconds: totalSec
         });
       }
       if (mindplayCh3) mindplayCh3.classList.add('hidden');
@@ -194,8 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const summaryTimeEl = document.getElementById('summary-time');
       if (summaryRecallEl) summaryRecallEl.textContent = `${ch1_score}/2`;
       if (summaryPatternEl) summaryPatternEl.textContent = ch2_correct ? 'Correct' : 'Incorrect';
-      const totalMs = performance.now() - mindplayStartTime;
-      if (summaryTimeEl) summaryTimeEl.textContent = `${(totalMs/1000).toFixed(1)}s`;
+      if (summaryTimeEl) summaryTimeEl.textContent = `${totalSec}s`;
       if (mindplaySummary) mindplaySummary.classList.remove('hidden');
     });
   }
