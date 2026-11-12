@@ -1,6 +1,6 @@
 /* ==========================================================================
    ALVI — TIMMY WELCOME COMPANION STYLES
-   Minimalist Hand-Drawn Companion & Mood Check-In
+   Original Abstract Hand-Drawn Companion & Entrance Animations
    ========================================================================== */
 
 :root {
@@ -20,11 +20,14 @@
   --timmy-shadow-glow: 0 10px 28px rgba(50, 108, 101, 0.22);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -42,13 +45,13 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 32px 20px;
+  padding: 36px 20px;
 }
 
 /* ── Container ──────────────────────────────────────────────────────────── */
 .timmy-container {
   width: 100%;
-  max-width: 640px;
+  max-width: 620px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,7 +59,7 @@ body {
   margin: auto;
 }
 
-/* ── Header Branding ────────────────────────────────────────────────────── */
+/* ── Header Branding Pill ───────────────────────────────────────────────── */
 .timmy-brand-tag {
   display: inline-flex;
   align-items: center;
@@ -69,8 +72,9 @@ body {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   border: 1px solid rgba(50, 108, 101, 0.15);
+  animation: timmyFadeIn 0.5s ease-out 0.1s both;
 }
 
 .timmy-brand-dot {
@@ -80,39 +84,70 @@ body {
   background-color: var(--timmy-teal);
 }
 
-/* ── Character Illustration Stage ───────────────────────────────────────── */
+/* ── Character Stage & Illustration ─────────────────────────────────────── */
 .timmy-stage {
   position: relative;
-  width: 220px;
-  height: 230px;
+  width: 210px;
+  height: 210px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 12px;
   user-select: none;
+  animation: timmyEntrance 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+  transform-origin: center bottom;
+}
+
+/* React Animation on Mood Click */
+.timmy-stage.reacting {
+  animation: timmyMoodReact 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .timmy-svg {
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 8px 16px rgba(31, 36, 33, 0.04));
+  filter: drop-shadow(0 6px 16px rgba(31, 36, 33, 0.04));
 }
 
-/* Eye and Pupil Elements */
-.timmy-eye {
+.timmy-body-outline {
   fill: #FFFFFF;
   stroke: var(--timmy-ink);
   stroke-width: 2.8;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: transform 0.15s ease-out;
+  transition: transform 0.25s ease;
+}
+
+.timmy-accent-sprout {
+  fill: var(--timmy-teal);
+  stroke: var(--timmy-ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Eye White and Blinking */
+.timmy-eye-group {
+  transition: transform 0.08s ease-in-out;
+}
+
+.timmy-eye-white {
+  fill: #FFFFFF;
+  stroke: var(--timmy-ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Blinking squashes eye vertically */
+.timmy-stage.blinking .timmy-eye-group {
+  transform: scaleY(0.06) !important;
 }
 
 .timmy-pupil {
   fill: var(--timmy-ink);
-  transition: transform 0.04s ease-out;
-  transform-origin: center;
+  transition: transform 0.035s ease-out;
 }
 
 .timmy-catchlight {
@@ -120,42 +155,19 @@ body {
   pointer-events: none;
 }
 
-.timmy-eyelid {
-  fill: var(--timmy-bg);
-  stroke: var(--timmy-ink);
-  stroke-width: 2.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: transform 0.08s ease-in-out;
-  transform-origin: top center;
-  transform: scaleY(0);
-}
-
-/* Blinking Animation Triggered via Class */
-.timmy-stage.blinking .timmy-eyelid {
-  transform: scaleY(1);
-}
-
 .timmy-mouth {
   fill: none;
   stroke: var(--timmy-ink);
-  stroke-width: 2.8;
+  stroke-width: 2.4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: d 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.timmy-body-line {
-  fill: none;
-  stroke: var(--timmy-ink);
-  stroke-width: 2.6;
-  stroke-linecap: round;
+  transition: d 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ── Speech & Response Bubble ───────────────────────────────────────────── */
 .timmy-bubble {
   min-height: 48px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,7 +181,7 @@ body {
   color: var(--timmy-teal);
   background-color: var(--timmy-teal-light);
   border: 1px solid rgba(50, 108, 101, 0.2);
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: 999px;
   max-width: 520px;
   display: inline-block;
@@ -191,6 +203,7 @@ body {
   color: var(--timmy-ink);
   margin: 0 0 8px 0;
   line-height: 1.25;
+  animation: timmyFadeUp 0.5s ease-out 0.55s both;
 }
 
 .timmy-subtitle {
@@ -199,6 +212,7 @@ body {
   color: var(--timmy-ink-muted);
   margin: 0 0 28px 0;
   line-height: 1.5;
+  animation: timmyFadeUp 0.5s ease-out 0.68s both;
 }
 
 /* ── Mood Selection Buttons Grid ────────────────────────────────────────── */
@@ -208,7 +222,7 @@ body {
   gap: 12px;
   width: 100%;
   max-width: 480px;
-  margin-bottom: 32px;
+  margin-bottom: 30px;
 }
 
 .timmy-mood-btn {
@@ -229,6 +243,8 @@ body {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   min-height: 52px;
   touch-action: manipulation;
+  /* Staggered entrance animation */
+  animation: timmyFadeUp 0.45s ease-out calc(0.75s + (var(--stagger-index, 1) * 0.07s)) both;
 }
 
 .timmy-mood-btn:hover {
@@ -273,9 +289,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
   max-width: 360px;
+  animation: timmyFadeIn 0.5s ease-out 1.25s both;
 }
 
 .timmy-continue-btn {
@@ -347,51 +364,144 @@ body {
   outline-offset: 2px;
 }
 
+/* ── Keyframe Animations ────────────────────────────────────────────────── */
+
+/* Entrance: Grows from 94% to 100% with subtle organic wobble settle */
+@keyframes timmyEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px) rotate(-1.5deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.025) translateY(-4px) rotate(1.2deg);
+  }
+
+  75% {
+    transform: scale(0.99) translateY(1px) rotate(-0.5deg);
+  }
+
+  90% {
+    transform: scale(1.006) translateY(-0.5px) rotate(0.2deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+/* Mood Reaction Bounce: playful, subtle organic squish and bounce */
+@keyframes timmyMoodReact {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+
+  25% {
+    transform: scale(1.05, 0.94) translateY(4px) rotate(-1.5deg);
+  }
+
+  55% {
+    transform: scale(0.97, 1.04) translateY(-6px) rotate(1deg);
+  }
+
+  80% {
+    transform: scale(1.01, 0.99) translateY(1px) rotate(-0.3deg);
+  }
+
+  100% {
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes timmyFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes timmyFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ── Accessibility & Reduced Motion ─────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
   }
+
+  .timmy-stage {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   .timmy-pupil {
     transition: none !important;
   }
-  .timmy-stage.blinking .timmy-eyelid {
+
+  .timmy-stage.blinking .timmy-eye-group {
     transform: none !important;
+  }
+
+  .timmy-stage.reacting {
+    animation: none !important;
   }
 }
 
 /* ── Mobile Responsiveness ──────────────────────────────────────────────── */
 @media (max-width: 520px) {
   body {
-    padding: 20px 16px;
+    padding: 24px 16px;
   }
+
   .timmy-stage {
-    width: 190px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
   }
+
   .timmy-question {
     font-size: 26px;
   }
+
   .timmy-subtitle {
     font-size: 15px;
     margin-bottom: 22px;
   }
+
   .timmy-mood-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     max-width: 320px;
     margin-bottom: 24px;
   }
+
   .timmy-mood-btn {
     padding: 12px 14px;
     font-size: 15px;
     min-height: 48px;
   }
+
   .timmy-continue-btn {
     font-size: 16px;
     min-height: 50px;
   }
 }
-

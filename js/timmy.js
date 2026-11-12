@@ -1,46 +1,44 @@
 /**
  * ALVI — Timmy Interactive Welcome Companion
- * Lightweight, vanilla JavaScript for pupil tracking, mood interaction, and accessibility.
+ * Abstract hand-drawn character logic: smooth eye tracking, blinking, mood reaction, and accessibility.
  */
 
 (function () {
   'use strict';
 
-  // ── Mood Data & Empathetic Non-Diagnostic Responses ──────────────────────
+  // ── Mood Data, Empathetic Responses & Subtle Mouth Curves ─────────────────
   const MOOD_DATA = {
     happy: {
       label: 'Happy',
       response: "Glad to hear that! Positive energy brings wonderful clarity to your day.",
-      mouthPath: "M 88,168 Q 100,186 112,168" // Broad warm smile
+      mouthPath: "M 102,152 Q 108,160 114,152" // Tiny pleasant smile
     },
     calm: {
       label: 'Calm',
       response: "A calm, centered breath is the perfect place to begin.",
-      mouthPath: "M 90,172 Q 100,180 110,172" // Serene gentle curve
+      mouthPath: "M 103,153 Q 108,157 113,153" // Calm serene curve
     },
     tired: {
       label: 'Tired',
       response: "Take it gently today. There is no rush at all.",
-      mouthPath: "M 92,174 Q 100,177 108,174" // Soft resting curve
+      mouthPath: "M 104,155 L 112,155" // Tiny soft resting dash
     },
     sad: {
       label: 'Sad',
       response: "Thank you for sharing. We're here with you, at your own gentle pace.",
-      mouthPath: "M 91,176 Q 100,171 109,176" // Gentle compassionate curve
+      mouthPath: "M 103,156 Q 108,153 113,156" // Gentle compassionate curve
     },
     anxious: {
       label: 'Anxious',
       response: "Take a slow, deep breath. There are no right or wrong answers here.",
-      mouthPath: "M 91,173 Q 96,170 100,174 Q 105,171 109,173" // Soft thoughtful wavy curve
+      mouthPath: "M 103,154 Q 106,152 108,155 Q 111,153 113,154" // Soft thoughtful wave
     },
     okay: {
       label: 'Okay',
       response: "Steady and balanced. Let's take today's journey together.",
-      mouthPath: "M 91,172 Q 100,176 109,172" // Content balanced curve
+      mouthPath: "M 104,153 Q 108,156 112,153" // Soft balanced curve
     }
   };
-
-  const DEFAULT_MOUTH_PATH = "M 90,172 Q 100,180 110,172";
 
   document.addEventListener('DOMContentLoaded', () => {
     const stage = document.getElementById('timmy-stage');
@@ -51,20 +49,24 @@
     const moodButtons = document.querySelectorAll('.timmy-mood-btn');
     const continueBtn = document.getElementById('timmy-continue-btn');
 
+    // Accessibility check: prefers-reduced-motion
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     let isReducedMotion = reducedMotionQuery.matches;
     reducedMotionQuery.addEventListener('change', (e) => {
       isReducedMotion = e.matches;
+      if (isReducedMotion) {
+        resetPupilsImmediately();
+      }
     });
 
     // ── Eye Tracking Logic ───────────────────────────────────────────────────
-    // Center positions in SVG coordinate space
-    const LEFT_EYE_SVG_CENTER = { x: 74, y: 128 };
-    const RIGHT_EYE_SVG_CENTER = { x: 126, y: 128 };
+    // SVG centers in 220x220 viewBox
+    const LEFT_EYE_SVG_CENTER = { x: 80, y: 108 };
+    const RIGHT_EYE_SVG_CENTER = { x: 136, y: 111 };
 
-    // Maximum pupil travel inside the oval eyes (keeps pupil strictly inside the eye)
+    // Strict boundary limits: keeps tiny pupils completely inside oversized oval eyes
     const MAX_PUPIL_RADIUS_X = 8.5;
-    const MAX_PUPIL_RADIUS_Y = 12.0;
+    const MAX_PUPIL_RADIUS_Y = 13.5;
 
     let targetLeftOffset = { x: 0, y: 0 };
     let targetRightOffset = { x: 0, y: 0 };
@@ -72,19 +74,18 @@
     let currentRightOffset = { x: 0, y: 0 };
     let rafId = null;
 
-    function calculatePupilOffset(eyeSvgCenter, pointerClientX, pointerClientY) {
+    function calculateOffset(eyeCenter, clientX, clientY) {
       if (!stage) return { x: 0, y: 0 };
 
-      // Convert SVG eye center to screen coordinates
       const stageRect = stage.getBoundingClientRect();
-      const scaleX = stageRect.width / 200; // viewBox width is 200
-      const scaleY = stageRect.height / 220; // viewBox height is 220
+      const scaleX = stageRect.width / 220;
+      const scaleY = stageRect.height / 220;
 
-      const eyeScreenX = stageRect.left + eyeSvgCenter.x * scaleX;
-      const eyeScreenY = stageRect.top + eyeSvgCenter.y * scaleY;
+      const eyeScreenX = stageRect.left + eyeCenter.x * scaleX;
+      const eyeScreenY = stageRect.top + eyeCenter.y * scaleY;
 
-      const deltaX = pointerClientX - eyeScreenX;
-      const deltaY = pointerClientY - eyeScreenY;
+      const deltaX = clientX - eyeScreenX;
+      const deltaY = clientY - eyeScreenY;
       const distance = Math.hypot(deltaX, deltaY);
 
       if (distance < 1) {
@@ -93,10 +94,9 @@
 
       const angle = Math.atan2(deltaY, deltaX);
 
-      // Distance dampening: subtle look when pointer is close, reaches max look at 240px
-      const dampFactor = Math.min(1.0, distance / 240);
+      // Distance dampening: subtle look when pointer is near, reaches max look at ~220px
+      const dampFactor = Math.min(1.0, distance / 220);
 
-      // Constrain inside elliptical eye boundary
       const offsetX = Math.cos(angle) * MAX_PUPIL_RADIUS_X * dampFactor;
       const offsetY = Math.sin(angle) * MAX_PUPIL_RADIUS_Y * dampFactor;
 
@@ -104,19 +104,24 @@
     }
 
     function updatePupilTargets(clientX, clientY) {
-      if (isReducedMotion) {
-        targetLeftOffset = { x: 0, y: 0 };
-        targetRightOffset = { x: 0, y: 0 };
-        return;
-      }
-      targetLeftOffset = calculatePupilOffset(LEFT_EYE_SVG_CENTER, clientX, clientY);
-      targetRightOffset = calculatePupilOffset(RIGHT_EYE_SVG_CENTER, clientX, clientY);
+      if (isReducedMotion) return;
+      targetLeftOffset = calculateOffset(LEFT_EYE_SVG_CENTER, clientX, clientY);
+      targetRightOffset = calculateOffset(RIGHT_EYE_SVG_CENTER, clientX, clientY);
     }
 
-    // Smooth animation loop using linear interpolation (lerp)
-    function animatePupils() {
+    function resetPupilsImmediately() {
+      targetLeftOffset = { x: 0, y: 0 };
+      targetRightOffset = { x: 0, y: 0 };
+      currentLeftOffset = { x: 0, y: 0 };
+      currentRightOffset = { x: 0, y: 0 };
+      if (leftPupil) leftPupil.setAttribute('transform', 'translate(0, 0)');
+      if (rightPupil) rightPupil.setAttribute('transform', 'translate(0, 0)');
+    }
+
+    // Smooth render loop using linear interpolation
+    function renderPupils() {
       if (!isReducedMotion) {
-        const ease = 0.18; // Smooth, natural eye movement
+        const ease = 0.16; // Buttery, natural eye movement
         currentLeftOffset.x += (targetLeftOffset.x - currentLeftOffset.x) * ease;
         currentLeftOffset.y += (targetLeftOffset.y - currentLeftOffset.y) * ease;
         currentRightOffset.x += (targetRightOffset.x - currentRightOffset.x) * ease;
@@ -135,15 +140,20 @@
           );
         }
       }
-      rafId = requestAnimationFrame(animatePupils);
+      rafId = requestAnimationFrame(renderPupils);
     }
 
-    // Start pupil render loop
-    rafId = requestAnimationFrame(animatePupils);
+    rafId = requestAnimationFrame(renderPupils);
 
-    // Mouse & Touch Tracking Listeners
+    // Pointer and Touch Tracking Listeners
     window.addEventListener('pointermove', (event) => {
       updatePupilTargets(event.clientX, event.clientY);
+    }, { passive: true });
+
+    window.addEventListener('touchstart', (event) => {
+      if (event.touches && event.touches[0]) {
+        updatePupilTargets(event.touches[0].clientX, event.touches[0].clientY);
+      }
     }, { passive: true });
 
     window.addEventListener('touchmove', (event) => {
@@ -152,87 +162,92 @@
       }
     }, { passive: true });
 
-    // When mouse leaves the window, eyes return gently to center
+    // When cursor/touch leaves, eyes gently return to center
     document.addEventListener('mouseleave', () => {
       targetLeftOffset = { x: 0, y: 0 };
       targetRightOffset = { x: 0, y: 0 };
     });
 
-    // ── Natural Blinking Mechanism ───────────────────────────────────────────
-    let blinkTimeout = null;
+    window.addEventListener('touchend', () => {
+      targetLeftOffset = { x: 0, y: 0 };
+      targetRightOffset = { x: 0, y: 0 };
+    });
 
-    function scheduleNextBlink() {
+    // ── Natural Periodic Blinking ────────────────────────────────────────────
+    let blinkTimer = null;
+
+    function scheduleBlink() {
       if (isReducedMotion) return;
-      // Random blink interval between 3.5s and 6.5s
-      const delay = 3500 + Math.random() * 3000;
-      blinkTimeout = setTimeout(() => {
+      // Natural interval between 4.0s and 6.8s
+      const nextDelay = 4000 + Math.random() * 2800;
+      blinkTimer = setTimeout(() => {
         if (stage && !isReducedMotion) {
           stage.classList.add('blinking');
           setTimeout(() => {
             stage.classList.remove('blinking');
-            scheduleNextBlink();
-          }, 160); // 160ms blink duration
+            scheduleBlink();
+          }, 140); // 140ms gentle blink
         } else {
-          scheduleNextBlink();
+          scheduleBlink();
         }
-      }, delay);
+      }, nextDelay);
     }
 
-    scheduleNextBlink();
+    scheduleBlink();
 
-    // ── Mood Selection Interaction ───────────────────────────────────────────
-    let selectedMood = null;
-
+    // ── Mood Selection Interaction & Reaction Bounce ─────────────────────────
     moodButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const moodKey = btn.getAttribute('data-mood');
         const moodInfo = MOOD_DATA[moodKey];
         if (!moodInfo) return;
 
-        selectedMood = moodKey;
-
-        // 1. Update button selection states and ARIA attributes
+        // 1. Highlight button and update ARIA states
         moodButtons.forEach((b) => {
           const isSelected = b === btn;
           b.classList.toggle('selected', isSelected);
           b.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
         });
 
-        // 2. Display gentle, non-diagnostic response
-        if (responseEl) {
-          responseEl.textContent = moodInfo.response;
-          responseEl.classList.remove('visible');
-          // Trigger reflow to restart fade-in transition cleanly
-          void responseEl.offsetWidth;
-          responseEl.classList.add('visible');
+        // 2. Timmy reaction animation (gentle playful bounce/squish)
+        if (stage && !isReducedMotion) {
+          stage.classList.remove('reacting');
+          void stage.offsetWidth; // Force reflow to restart keyframe
+          stage.classList.add('reacting');
         }
 
-        // 3. Subtle hand-drawn mouth adjustment
+        // 3. Subtle mouth adjustment
         if (mouth && moodInfo.mouthPath) {
           mouth.setAttribute('d', moodInfo.mouthPath);
         }
 
-        // 4. Reveal & activate "Continue to Dashboard" button
-        if (continueBtn) {
-          continueBtn.classList.add('active');
-          continueBtn.focus();
+        // 4. Display gentle, non-diagnostic response
+        if (responseEl) {
+          responseEl.textContent = moodInfo.response;
+          responseEl.classList.remove('visible');
+          void responseEl.offsetWidth; // Force reflow
+          responseEl.classList.add('visible');
         }
 
-        // 5. Store selected mood in sessionStorage for optional session context
+        // 5. Reveal & activate "Continue to Dashboard" button
+        if (continueBtn) {
+          continueBtn.classList.add('active');
+        }
+
+        // 6. Save mood in sessionStorage
         try {
           sessionStorage.setItem('alvi_user_mood', moodKey);
           sessionStorage.setItem('alvi_mood_timestamp', new Date().toISOString());
         } catch (_) {
-          // Ignore storage restrictions if disabled
+          // Ignore storage restrictions
         }
       });
     });
 
-    // Clean up animation on page unload
+    // Clean up animation on unload
     window.addEventListener('beforeunload', () => {
       if (rafId) cancelAnimationFrame(rafId);
-      if (blinkTimeout) clearTimeout(blinkTimeout);
+      if (blinkTimer) clearTimeout(blinkTimer);
     });
   });
 })();
-
