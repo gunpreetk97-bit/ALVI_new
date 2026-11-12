@@ -1,0 +1,397 @@
+/* ==========================================================================
+   ALVI — TIMMY WELCOME COMPANION STYLES
+   Minimalist Hand-Drawn Companion & Mood Check-In
+   ========================================================================== */
+
+:root {
+  --timmy-bg: #F8F6F3;
+  --timmy-card-bg: #FFFFFF;
+  --timmy-ink: #1F2421;
+  --timmy-ink-muted: #5A625E;
+  --timmy-ink-faint: #8B948F;
+  --timmy-border: #E5E0D8;
+  --timmy-border-hover: #C5BFB5;
+  --timmy-teal: #326C65;
+  --timmy-teal-hover: #26544E;
+  --timmy-teal-light: #EBF3F2;
+  --timmy-teal-ring: rgba(50, 108, 101, 0.25);
+  --timmy-shadow-sm: 0 2px 8px rgba(31, 36, 33, 0.04);
+  --timmy-shadow-md: 0 8px 24px rgba(31, 36, 33, 0.06);
+  --timmy-shadow-glow: 0 10px 28px rgba(50, 108, 101, 0.22);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--timmy-bg);
+  color: var(--timmy-ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32px 20px;
+}
+
+/* ── Container ──────────────────────────────────────────────────────────── */
+.timmy-container {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: auto;
+}
+
+/* ── Header Branding ────────────────────────────────────────────────────── */
+.timmy-brand-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background-color: #ECE8E1;
+  color: var(--timmy-teal);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  border: 1px solid rgba(50, 108, 101, 0.15);
+}
+
+.timmy-brand-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--timmy-teal);
+}
+
+/* ── Character Illustration Stage ───────────────────────────────────────── */
+.timmy-stage {
+  position: relative;
+  width: 220px;
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  user-select: none;
+}
+
+.timmy-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 8px 16px rgba(31, 36, 33, 0.04));
+}
+
+/* Eye and Pupil Elements */
+.timmy-eye {
+  fill: #FFFFFF;
+  stroke: var(--timmy-ink);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s ease-out;
+}
+
+.timmy-pupil {
+  fill: var(--timmy-ink);
+  transition: transform 0.04s ease-out;
+  transform-origin: center;
+}
+
+.timmy-catchlight {
+  fill: #FFFFFF;
+  pointer-events: none;
+}
+
+.timmy-eyelid {
+  fill: var(--timmy-bg);
+  stroke: var(--timmy-ink);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.08s ease-in-out;
+  transform-origin: top center;
+  transform: scaleY(0);
+}
+
+/* Blinking Animation Triggered via Class */
+.timmy-stage.blinking .timmy-eyelid {
+  transform: scaleY(1);
+}
+
+.timmy-mouth {
+  fill: none;
+  stroke: var(--timmy-ink);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: d 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.timmy-body-line {
+  fill: none;
+  stroke: var(--timmy-ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+/* ── Speech & Response Bubble ───────────────────────────────────────────── */
+.timmy-bubble {
+  min-height: 48px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timmy-response-text {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--timmy-teal);
+  background-color: var(--timmy-teal-light);
+  border: 1px solid rgba(50, 108, 101, 0.2);
+  padding: 10px 20px;
+  border-radius: 999px;
+  max-width: 520px;
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.timmy-response-text.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Typography & Headings ──────────────────────────────────────────────── */
+.timmy-question {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--timmy-ink);
+  margin: 0 0 8px 0;
+  line-height: 1.25;
+}
+
+.timmy-subtitle {
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--timmy-ink-muted);
+  margin: 0 0 28px 0;
+  line-height: 1.5;
+}
+
+/* ── Mood Selection Buttons Grid ────────────────────────────────────────── */
+.timmy-mood-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 32px;
+}
+
+.timmy-mood-btn {
+  appearance: none;
+  background-color: var(--timmy-card-bg);
+  border: 1.5px solid var(--timmy-border);
+  color: var(--timmy-ink);
+  border-radius: 16px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: var(--timmy-shadow-sm);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 52px;
+  touch-action: manipulation;
+}
+
+.timmy-mood-btn:hover {
+  border-color: var(--timmy-teal);
+  background-color: var(--timmy-teal-light);
+  color: var(--timmy-teal-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(50, 108, 101, 0.12);
+}
+
+.timmy-mood-btn:active {
+  transform: translateY(0);
+}
+
+.timmy-mood-btn:focus-visible {
+  outline: 3px solid var(--timmy-teal);
+  outline-offset: 3px;
+}
+
+.timmy-mood-btn.selected {
+  background-color: var(--timmy-teal);
+  border-color: var(--timmy-teal);
+  color: #FFFFFF;
+  box-shadow: var(--timmy-shadow-glow);
+  transform: translateY(-2px);
+}
+
+.timmy-mood-btn.selected .mood-indicator {
+  background-color: #FFFFFF;
+}
+
+.mood-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--timmy-border-hover);
+  transition: background-color 0.2s ease;
+}
+
+/* ── Action Buttons ─────────────────────────────────────────────────────── */
+.timmy-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.timmy-continue-btn {
+  appearance: none;
+  width: 100%;
+  min-height: 54px;
+  background-color: var(--timmy-teal);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  padding: 14px 28px;
+  cursor: pointer;
+  box-shadow: var(--timmy-shadow-glow);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  opacity: 0.35;
+  pointer-events: none;
+  transform: scale(0.98);
+}
+
+.timmy-continue-btn.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.timmy-continue-btn:hover {
+  background-color: var(--timmy-teal-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(50, 108, 101, 0.32);
+}
+
+.timmy-continue-btn:focus-visible {
+  outline: 3px solid var(--timmy-teal);
+  outline-offset: 3px;
+}
+
+.timmy-skip-btn {
+  background: transparent;
+  border: none;
+  color: var(--timmy-ink-muted);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timmy-skip-btn:hover {
+  color: var(--timmy-ink);
+  text-decoration: underline;
+}
+
+.timmy-skip-btn:focus-visible {
+  outline: 2px solid var(--timmy-teal);
+  outline-offset: 2px;
+}
+
+/* ── Accessibility & Reduced Motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .timmy-pupil {
+    transition: none !important;
+  }
+  .timmy-stage.blinking .timmy-eyelid {
+    transform: none !important;
+  }
+}
+
+/* ── Mobile Responsiveness ──────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  body {
+    padding: 20px 16px;
+  }
+  .timmy-stage {
+    width: 190px;
+    height: 200px;
+  }
+  .timmy-question {
+    font-size: 26px;
+  }
+  .timmy-subtitle {
+    font-size: 15px;
+    margin-bottom: 22px;
+  }
+  .timmy-mood-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-width: 320px;
+    margin-bottom: 24px;
+  }
+  .timmy-mood-btn {
+    padding: 12px 14px;
+    font-size: 15px;
+    min-height: 48px;
+  }
+  .timmy-continue-btn {
+    font-size: 16px;
+    min-height: 50px;
+  }
+}
+
