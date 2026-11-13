@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALVI — 3D Brain (model-viewer prototype)</title>
+  <meta name="description" content="Standalone prototype: anatomical brain rendered with Google model-viewer. Warm ivory, soft lighting, touch & mouse interaction.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/brain-mv-demo.css">
+
+  <!-- Google model-viewer web component — single script, no build step needed -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+
+  <main class="stage" role="main">
+
+    <!-- ── Top bar ───────────────────────────────────────────────── -->
+    <header class="topbar">
+      <div class="brand-pill">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span>ALVI Neural Architecture</span>
+      </div>
+      <nav class="topbar-nav" aria-label="Prototype navigation">
+        <a href="index.html" class="nav-link">← Back to ALVI</a>
+      </nav>
+    </header>
+
+    <!-- ── Editorial headline ────────────────────────────────────── -->
+    <section class="headline" aria-label="Section title">
+      <span class="eyebrow">Anatomical Prototype · CC BY-SA 4.0</span>
+      <h1 class="title">Human Cerebral Cortex</h1>
+      <p class="subtitle">Gyri, sulci and brainstem derived from open neuroimaging atlases.<br>Drag to rotate · Scroll to zoom · Double-tap to reset.</p>
+    </section>
+
+    <!-- ── model-viewer ──────────────────────────────────────────── -->
+    <div class="viewer-wrap">
+      <model-viewer
+        id="brain-viewer"
+        src="assets/models/brain.glb"
+        alt="Interactive 3D anatomical human brain sculpture — drag to rotate, scroll to zoom"
+        auto-rotate
+        auto-rotate-delay="1200"
+        rotation-per-second="8deg"
+        camera-controls
+        touch-action="pan-y"
+        shadow-intensity="0.6"
+        shadow-softness="1"
+        exposure="1.05"
+        environment-image="neutral"
+        camera-orbit="30deg 75deg 5m"
+        min-camera-orbit="auto auto 2m"
+        max-camera-orbit="auto auto 9m"
+        style="--mv-background-color: transparent;"
+        aria-label="Interactive 3D brain: drag with mouse or touch to rotate, scroll to zoom"
+      >
+
+        <!-- Loading slot -->
+        <div class="mv-loading" slot="progress-bar" id="mv-progress">
+          <div class="mv-progress-track">
+            <div class="mv-progress-fill" id="mv-fill"></div>
+          </div>
+          <span class="mv-loading-label" id="mv-label">Loading anatomical mesh…</span>
+        </div>
+
+        <!-- Error fallback -->
+        <div class="mv-error" slot="error" id="mv-error" role="alert">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="#C28A52" stroke-width="1.5"/>
+            <path d="M12 7v5M12 16v.5" stroke="#C28A52" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <p>Could not load the 3D model.<br>
+            Ensure the local server is running:<br>
+            <code>powershell -File server.ps1</code><br>
+            then open <code>http://localhost:8000/brain-mv-demo.html</code>
+          </p>
+        </div>
+
+        <!-- Hotspot label: frontal lobe -->
+        <button
+          class="hotspot"
+          slot="hotspot-frontal"
+          data-surface="0 0 0"
+          data-position="0 0.3 0.5"
+          data-normal="0 0 1"
+          aria-label="Frontal lobe — planning and executive function"
+        >
+          <span class="hotspot-label">Frontal Lobe</span>
+        </button>
+
+      </model-viewer>
+
+      <!-- Interaction hint -->
+      <div class="hint-row" aria-hidden="true">
+        <span>✦ Drag to rotate</span>
+        <span>·</span>
+        <span>Scroll to zoom</span>
+        <span>·</span>
+        <span>Auto-spins when idle</span>
+      </div>
+    </div>
+
+    <!-- ── Attribution placard ───────────────────────────────────── -->
+    <footer class="placard" role="contentinfo">
+      <div class="placard-inner">
+        <p class="placard-title">Model provenance &amp; attribution</p>
+        <p class="placard-body">
+          <strong>Source:</strong> itayinbarr / BrainProject (GitHub) — based on Z-Anatomy / DBCLS open neuroimaging atlas.<br>
+          <strong>License:</strong>
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">
+            Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+          </a><br>
+          <strong>Rendered with:</strong>
+          <a href="https://modelviewer.dev/" target="_blank" rel="noopener noreferrer">Google model-viewer</a>
+          — Apache-2.0 open-source web component.
+        </p>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Reduced-motion & progress wiring -->
+  <script>
+    (function () {
+      'use strict';
+
+      const mv = document.getElementById('brain-viewer');
+      const fill = document.getElementById('mv-fill');
+      const label = document.getElementById('mv-label');
+
+      if (!mv) return;
+
+      // Respect reduced-motion — disable auto-rotate
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function applyMotion(reduced) {
+        if (reduced) {
+          mv.removeAttribute('auto-rotate');
+        } else {
+          mv.setAttribute('auto-rotate', '');
+        }
+      }
+      applyMotion(mq.matches);
+      mq.addEventListener('change', e => applyMotion(e.matches));
+
+      // Wire up progress bar
+      mv.addEventListener('progress', e => {
+        const pct = Math.round(e.detail.totalProgress * 100);
+        if (fill) fill.style.width = pct + '%';
+        if (label) label.textContent = pct < 100
+          ? 'Loading anatomical mesh… ' + pct + '%'
+          : 'Finalising…';
+      });
+
+      // Hide progress bar and normalize materials when model loads
+      mv.addEventListener('load', () => {
+        // Strip emissive glow [1, 1, 1] from raw GLTF so brain folds become visible
+        try {
+          if (mv.model && mv.model.materials) {
+            mv.model.materials.forEach(mat => {
+              if (mat.setEmissiveFactor) {
+                mat.setEmissiveFactor([0, 0, 0]);
+              }
+              if (mat.pbrMetallicRoughness) {
+                if (mat.pbrMetallicRoughness.setBaseColorFactor) {
+                  mat.pbrMetallicRoughness.setBaseColorFactor([0.62, 0.60, 0.57, 1.0]);
+                }
+                if (mat.pbrMetallicRoughness.setRoughnessFactor) {
+                  mat.pbrMetallicRoughness.setRoughnessFactor(0.72);
+                }
+                if (mat.pbrMetallicRoughness.setMetallicFactor) {
+                  mat.pbrMetallicRoughness.setMetallicFactor(0.0);
+                }
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Material adjustment:', e);
+        }
+
+        const prog = document.getElementById('mv-progress');
+        if (prog) {
+          prog.style.opacity = '0';
+          setTimeout(() => { prog.style.display = 'none'; }, 400);
+        }
+      });
+
+      // Show error slot if model fails
+      mv.addEventListener('error', () => {
+        const err = document.getElementById('mv-error');
+        if (err) err.style.display = 'flex';
+      });
+
+    })();
+  </script>
+
+</body>
+</html>
+

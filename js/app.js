@@ -53,11 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const key = node.getAttribute('data-timeline-info');
         const info = window.ALVI?.timelineData?.[key];
         if (info) {
-          // Highlight selected node
+          // Highlight selected node with clean architectural active state
           timelineNodes.forEach(n => {
-            n.classList.remove('ring-2', 'ring-indigo-400', 'ring-offset-2', 'ring-offset-slate-900', 'rounded-2xl', 'scale-105');
+            n.classList.remove('active', 'ring-2', 'ring-indigo-400', 'ring-offset-2', 'ring-offset-slate-900', 'rounded-2xl', 'scale-105');
           });
-          node.classList.add('ring-2', 'ring-indigo-400', 'ring-offset-2', 'ring-offset-slate-900', 'rounded-2xl', 'scale-105');
+          node.classList.add('active');
 
           // Smooth transition effect for detail card update
           detailBox.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // App-wide Profile Synchronization from localStorage
-  window.ALVI.syncProfile = function() {
+  window.ALVI.syncProfile = function () {
     const DEFAULT_NAME = 'Mr. Sharma';
     const DEFAULT_ID = '#ALVI-889B-IND';
 
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Welcome Greetings across pages (e.g. Dashboard)
     const welcomeHeadings = document.querySelectorAll('#dashboard-welcome-heading');
     welcomeHeadings.forEach(el => {
-      el.textContent = `Good morning, ${savedName} 👋`;
+      el.textContent = `Good to see you again, ${savedName}.`;
     });
 
     // Profile Page Elements

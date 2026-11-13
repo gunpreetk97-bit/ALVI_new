@@ -1,0 +1,308 @@
+/* ==========================================================================
+   ALVI — STANDALONE 3D BRAIN SCULPTURE PROTOTYPE STYLES
+   Museum-Sculpture Aesthetic: Warm Ivory, Studio Soft Shadows, Minimal Chrome
+   ========================================================================== */
+
+:root {
+  --bg-canvas: #F8F6F3;
+  --bg-surface: #FFFFFF;
+  --ink-primary: #1C2420;
+  --ink-soft: #45504A;
+  --ink-muted: #727D77;
+  --ink-faint: #9EA8A2;
+  --teal-primary: #326C65;
+  --teal-light: #EBF3F2;
+  --teal-border: rgba(50, 108, 101, 0.22);
+  --border-subtle: #E6E1D8;
+  --shadow-sculpture: 0 16px 40px rgba(28, 36, 32, 0.06);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* ── Fullscreen 3D Stage ───────────────────────────────────────────────── */
+.sculpture-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 32px 28px;
+  user-select: none;
+}
+
+/* ── WebGL Canvas Container ────────────────────────────────────────────── */
+#webgl-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  outline: none;
+  cursor: grab;
+}
+
+#webgl-canvas-container:active {
+  cursor: grabbing;
+}
+
+/* ── Minimalist Header Overlay ─────────────────────────────────────────── */
+.header-overlay {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  pointer-events: none;
+}
+
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background-color: #EDE8E0;
+  border: 1px solid var(--border-subtle);
+  color: var(--teal-primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  pointer-events: auto;
+}
+
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--teal-primary);
+}
+
+.sculpture-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ink-primary);
+  line-height: 1.2;
+}
+
+.sculpture-subtitle {
+  font-size: 14.5px;
+  color: var(--ink-muted);
+  margin-top: 6px;
+  font-weight: 450;
+}
+
+/* ── Loading Screen Indicator ──────────────────────────────────────────── */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-canvas);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(50, 108, 101, 0.15);
+  border-top-color: var(--teal-primary);
+  border-radius: 50%;
+  animation: spin 0.85s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  letter-spacing: -0.01em;
+}
+
+.loading-subtext {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+/* ── Bottom Controls & Museum Placard ──────────────────────────────────── */
+.bottom-overlay {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
+
+/* Interactive Placard Card */
+.placard-card {
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 14px 22px;
+  width: 100%;
+  box-shadow: var(--shadow-sculpture);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: auto;
+}
+
+.placard-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.placard-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--teal-primary);
+}
+
+.placard-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  letter-spacing: -0.01em;
+}
+
+.placard-desc {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+
+/* Reset / Perspective Button */
+.btn-reset-view {
+  appearance: none;
+  background-color: var(--bg-canvas);
+  border: 1.5px solid var(--border-subtle);
+  color: var(--ink-soft);
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-reset-view:hover {
+  background-color: var(--teal-light);
+  border-color: var(--teal-border);
+  color: var(--teal-primary);
+  transform: translateY(-1px);
+}
+
+.btn-reset-view:active {
+  transform: translateY(0);
+}
+
+.btn-reset-view:focus-visible {
+  outline: 3px solid var(--teal-primary);
+  outline-offset: 2px;
+}
+
+/* Interaction Hint & Attribution */
+.interaction-hint {
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.attribution-note {
+  font-size: 11px;
+  color: var(--ink-faint);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.attribution-note a {
+  color: var(--ink-muted);
+  text-decoration: underline;
+}
+
+/* ── Accessibility: Reduced Motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ── Mobile Layout Adjustments ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .sculpture-wrapper {
+    padding: 24px 16px 20px;
+  }
+
+  .sculpture-title {
+    font-size: 24px;
+  }
+
+  .sculpture-subtitle {
+    font-size: 13px;
+  }
+
+  .placard-card {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .btn-reset-view {
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -3,145 +3,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ALVI — Welcome with Timmy</title>
-  <meta name="description" content="Meet Timmy, ALVI's friendly cognitive wellness companion. A mindful check-in before entering your dashboard.">
-  
-  <!-- Preconnect and Google Fonts: Inter -->
+  <title>ALVI — Meet Timmy</title>
+  <meta name="description" content="Meet Timmy, ALVI's friendly cognitive wellness companion. A mindful check-in before your session.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Timmy Companion Stylesheet -->
   <link rel="stylesheet" href="css/timmy.css">
 </head>
 <body>
 
-  <main class="timmy-container" role="main">
-    
-    <!-- BRAND PILL -->
-    <div class="timmy-brand-tag" aria-label="ALVI Cognitive Wellness Companion">
-      <span class="timmy-brand-dot" aria-hidden="true"></span>
-      <span>ALVI COMPANION</span>
+  <main class="timmy-scene" role="main">
+
+    <!-- BRAND LABEL -->
+    <div class="timmy-brand" aria-label="ALVI Cognitive Wellness">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span>ALVI</span>
     </div>
 
-    <!-- TIMMY: ORIGINAL ABSTRACT ART-DIRECTED CHARACTER -->
-    <div id="timmy-stage" class="timmy-stage" aria-label="Timmy, a friendly abstract companion whose eyes follow your cursor">
-      <svg class="timmy-svg" viewBox="0 0 220 220" role="img" aria-hidden="true">
+    <!-- TIMMY: Large Abstract Thinking Doodle (SVG) -->
+    <figure class="timmy-art" role="img" aria-label="Timmy, ALVI's thinking companion. His eyes follow your cursor.">
+      <svg id="timmy-svg"
+           viewBox="0 0 460 460"
+           xmlns="http://www.w3.org/2000/svg"
+           aria-hidden="true">
+
         <defs>
-          <!-- Left Eye Clip for Pupil Containment -->
-          <clipPath id="left-eye-clip">
-            <ellipse cx="80" cy="108" rx="19.5" ry="29" />
+          <!-- Left eye clip keeps pupil inside the oval -->
+          <clipPath id="clip-left-eye">
+            <ellipse cx="158" cy="218" rx="37" ry="51"/>
           </clipPath>
-          <!-- Right Eye Clip for Pupil Containment -->
-          <clipPath id="right-eye-clip">
-            <ellipse cx="136" cy="111" rx="21" ry="29.5" />
+          <!-- Right eye clip -->
+          <clipPath id="clip-right-eye">
+            <ellipse cx="285" cy="224" rx="43" ry="48"/>
           </clipPath>
         </defs>
 
-        <!-- Subtle Grounding Shadow (Medical Teal Tint) -->
-        <ellipse cx="110" cy="208" rx="58" ry="7" fill="#326C65" opacity="0.08" />
+        <!-- Soft grounding shadow -->
+        <ellipse class="t-shadow" cx="216" cy="450" rx="88" ry="10"/>
 
-        <!-- Abstract Asymmetrical Living Shape (Completely Non-Human) -->
-        <g id="timmy-body-group" class="timmy-body-group">
-          <!-- Main Organic Body Silhouette -->
-          <path class="timmy-body-outline"
-                d="M 112, 24
-                   C 160, 21  195, 58  191, 110
-                   C 187, 160 166, 199 112, 203
-                   C 57, 207  25, 168  27, 116
-                   C 29, 61   62, 27   112, 24 Z" />
+        <!-- ── BODY OUTLINE: hand-drawn irregular blob, animated draw-on ── -->
+        <path id="timmy-body"
+              class="t-body"
+              d="M 215,20
+                 C 278,15  345,52  372,108
+                 C 396,158  400,215  393,268
+                 C 385,322  365,368  328,398
+                 C 290,428  242,440  195,437
+                 C 148,434  102,418  70,386
+                 C 36,352  20,304  20,254
+                 C 20,202  38,152  68,112
+                 C 100,70  152,25  215,20 Z"/>
 
-          <!-- Delicate Medical Teal Accent Leaf/Sprout atop Timmy -->
-          <path class="timmy-accent-sprout"
-                d="M 112,23 C 112,11 121,9 121,14 C 121,19 114,23 112,23 Z" />
-
-          <!-- Left Eye: Large Expressive Asymmetrical Oval -->
-          <g id="timmy-left-eye-group" class="timmy-eye-group" style="transform-origin: 80px 108px;">
-            <ellipse class="timmy-eye-white" cx="80" cy="108" rx="19.5" ry="29" />
-            <!-- Left Pupil (Tracked via JS inside clip) -->
-            <g clip-path="url(#left-eye-clip)">
-              <g id="timmy-pupil-left">
-                <ellipse class="timmy-pupil" cx="80" cy="108" rx="5.5" ry="6.5" />
-                <circle class="timmy-catchlight" cx="78.5" cy="105.5" r="1.6" />
-              </g>
+        <!-- ── LEFT EYE: slightly smaller, tilted left ── -->
+        <g id="timmy-left-eye"
+           class="t-eye-group"
+           style="transform-origin: 158px 218px;">
+          <ellipse class="t-eye-white"
+                   cx="158" cy="218" rx="37" ry="51"
+                   transform="rotate(-6 158 218)"/>
+          <g clip-path="url(#clip-left-eye)">
+            <g id="timmy-pupil-l" class="t-pupil-wrap">
+              <ellipse class="t-pupil"  cx="158" cy="218" rx="13" ry="17"/>
+              <circle  class="t-shine"  cx="151" cy="211"  r="3.8"/>
             </g>
           </g>
-
-          <!-- Right Eye: Large Expressive Asymmetrical Oval -->
-          <g id="timmy-right-eye-group" class="timmy-eye-group" style="transform-origin: 136px 111px;">
-            <ellipse class="timmy-eye-white" cx="136" cy="111" rx="21" ry="29.5" />
-            <!-- Right Pupil (Tracked via JS inside clip) -->
-            <g clip-path="url(#right-eye-clip)">
-              <g id="timmy-pupil-right">
-                <ellipse class="timmy-pupil" cx="136" cy="111" rx="5.5" ry="6.5" />
-                <circle class="timmy-catchlight" cx="134.5" cy="108.5" r="1.6" />
-              </g>
-            </g>
-          </g>
-
-          <!-- Tiny Minimalist Hand-Drawn Mouth (Subtly Adapts to Mood) -->
-          <path id="timmy-mouth" class="timmy-mouth" d="M 103,153 Q 108,157 113,153" />
         </g>
+
+        <!-- ── RIGHT EYE: slightly wider, lower, tilted right ── -->
+        <g id="timmy-right-eye"
+           class="t-eye-group"
+           style="transform-origin: 285px 224px;">
+          <ellipse class="t-eye-white"
+                   cx="285" cy="224" rx="43" ry="48"
+                   transform="rotate(5 285 224)"/>
+          <g clip-path="url(#clip-right-eye)">
+            <g id="timmy-pupil-r" class="t-pupil-wrap">
+              <ellipse class="t-pupil"  cx="285" cy="224" rx="15" ry="19"/>
+              <circle  class="t-shine"  cx="277" cy="216"  r="4.2"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- ── MOUTH: subtle, changes with selected mood ── -->
+        <path id="timmy-mouth"
+              class="t-mouth"
+              d="M 196,340 Q 220,347 244,340"/>
+
+        <!-- ── THOUGHT BUBBLE: appears on thinking moments ── -->
+        <g id="timmy-think" class="t-think" aria-hidden="true">
+          <!-- Trail dots -->
+          <circle class="t-think-trail" cx="372" cy="112" r="4.5"/>
+          <circle class="t-think-trail" cx="393"  cy="90" r="7"/>
+          <!-- Main bubble -->
+          <circle class="t-think-cloud" cx="415"  cy="68" r="20"/>
+          <!-- Animated dots inside bubble -->
+          <circle class="t-think-dot"   cx="408"  cy="68" r="2.6"/>
+          <circle class="t-think-dot"   cx="415"  cy="68" r="2.6"/>
+          <circle class="t-think-dot"   cx="422"  cy="68" r="2.6"/>
+        </g>
+
       </svg>
-    </div>
+    </figure>
 
-    <!-- EMPATHETIC RESPONSE BUBBLE -->
-    <div class="timmy-bubble" aria-live="polite">
-      <p id="timmy-response" class="timmy-response-text"></p>
-    </div>
+    <!-- ── INTERACTION LAYER: question, moods, response, actions ── -->
+    <div class="timmy-interaction">
 
-    <!-- QUESTION & SUBTITLE (Staggered Entrance) -->
-    <h1 class="timmy-question">How are you feeling today?</h1>
-    <p class="timmy-subtitle">I'm Timmy, your cognitive wellness companion. Choose a mood or feel free to skip.</p>
+      <h1 class="timmy-q">How are you feeling today?</h1>
 
-    <!-- ACCESSIBLE MOOD BUTTONS (Staggered Entrance) -->
-    <div class="timmy-mood-grid" role="group" aria-label="Select your current mood">
-      <button type="button" class="timmy-mood-btn" data-mood="happy" aria-pressed="false" style="--stagger-index: 1;">
-        <span class="mood-indicator" aria-hidden="true"></span>
-        <span>Happy</span>
-      </button>
+      <div class="timmy-moods" role="group" aria-label="Select your current mood">
+        <button class="mood-pill" type="button" data-mood="happy"   aria-pressed="false" style="--i:0">Happy</button>
+        <button class="mood-pill" type="button" data-mood="calm"    aria-pressed="false" style="--i:1">Calm</button>
+        <button class="mood-pill" type="button" data-mood="tired"   aria-pressed="false" style="--i:2">Tired</button>
+        <button class="mood-pill" type="button" data-mood="sad"     aria-pressed="false" style="--i:3">Sad</button>
+        <button class="mood-pill" type="button" data-mood="anxious" aria-pressed="false" style="--i:4">Anxious</button>
+        <button class="mood-pill" type="button" data-mood="okay"    aria-pressed="false" style="--i:5">Okay</button>
+      </div>
 
-      <button type="button" class="timmy-mood-btn" data-mood="calm" aria-pressed="false" style="--stagger-index: 2;">
-        <span class="mood-indicator" aria-hidden="true"></span>
-        <span>Calm</span>
-      </button>
+      <!-- Response appears after mood selection -->
+      <p id="timmy-response"
+         class="timmy-response"
+         aria-live="polite"
+         aria-atomic="true"></p>
 
-      <button type="button" class="timmy-mood-btn" data-mood="tired" aria-pressed="false" style="--stagger-index: 3;">
-        <span class="mood-indicator" aria-hidden="true"></span>
-        <span>Tired</span>
-      </button>
+      <!-- Navigation actions -->
+      <div class="timmy-actions">
+        <a id="timmy-continue"
+           href="dashboard.html"
+           class="btn-continue"
+           role="button"
+           aria-label="Continue to ALVI Dashboard">
+          Continue to Dashboard <span aria-hidden="true">→</span>
+        </a>
+        <a href="dashboard.html"
+           class="btn-skip"
+           aria-label="Skip mood check-in and enter dashboard">Skip for now</a>
+      </div>
 
-      <button type="button" class="timmy-mood-btn" data-mood="sad" aria-pressed="false" style="--stagger-index: 4;">
-        <span class="mood-indicator" aria-hidden="true"></span>
-        <span>Sad</span>
-      </button>
-
-      <button type="button" class="timmy-mood-btn" data-mood="anxious" aria-pressed="false" style="--stagger-index: 5;">
-        <span class="mood-indicator" aria-hidden="true"></span>
-        <span>Anxious</span>
-      </button>
-
-      <button type="button" class="timmy-mood-btn" data-mood="okay" aria-pressed="false" style="--stagger-index: 6;">
-        <span class="mood-indicator" aria-hidden="true"></span>
-        <span>Okay</span>
-      </button>
-    </div>
-
-    <!-- ACTIONS CONTAINER (Staggered Entrance) -->
-    <div class="timmy-actions">
-      <a id="timmy-continue-btn" href="dashboard.html" class="timmy-continue-btn" role="button" aria-label="Continue to ALVI Dashboard">
-        <span>Continue to Dashboard</span>
-        <span aria-hidden="true">→</span>
-      </a>
-
-      <a id="timmy-skip-btn" href="dashboard.html" class="timmy-skip-btn" aria-label="Skip mood check-in and enter dashboard">
-        Skip for now
-      </a>
     </div>
 
   </main>
 
-  <!-- Timmy Companion Script -->
   <script src="js/timmy.js"></script>
 </body>
 </html>

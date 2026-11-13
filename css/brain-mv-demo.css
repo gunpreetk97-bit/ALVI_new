@@ -1,0 +1,285 @@
+/* ============================================================
+   ALVI — brain-mv-demo.css
+   Scoped entirely to brain-mv-demo.html
+   Palette: ivory #F8F6F3 · teal #326C65 · charcoal #1C2420
+            sage #DCE7E1 · amber #C28A52
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  background: #F8F6F3;
+  color: #1C2420;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100dvh;
+  background: #F8F6F3;
+}
+
+/* ── Stage ──────────────────────────────────────────────────── */
+.stage {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  min-height: 100dvh;
+  padding: 0 0 2rem;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 2rem;
+  border-bottom: 1px solid #E4E0DB;
+}
+
+.brand-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #326C65;
+}
+
+.brand-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #326C65;
+  flex-shrink: 0;
+}
+
+.nav-link {
+  font-size: 0.82rem;
+  color: #5A6B68;
+  text-decoration: none;
+  transition: color 0.18s;
+}
+.nav-link:hover { color: #326C65; }
+
+/* ── Headline ────────────────────────────────────────────────── */
+.headline {
+  text-align: center;
+  padding: 2.4rem 1.5rem 0.6rem;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #C28A52;
+  margin-bottom: 0.6rem;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: #1C2420;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 0.6rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #5A6B68;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ── Viewer wrapper ──────────────────────────────────────────── */
+.viewer-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 0 0;
+}
+
+model-viewer {
+  width: min(640px, 92vw);
+  height: min(520px, 70vh);
+  background: transparent;
+  --poster-color: transparent;
+  border-radius: 20px;
+  /* Subtle warm shadow framing */
+  box-shadow:
+    0 2px 8px rgba(28,36,32,0.06),
+    0 12px 48px rgba(28,36,32,0.08);
+}
+
+/* ── Progress bar (injected into slot) ───────────────────────── */
+.mv-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: #F8F6F3;
+  border-radius: 20px;
+  transition: opacity 0.4s;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.mv-progress-track {
+  width: 180px;
+  height: 2px;
+  background: #E4E0DB;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mv-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #326C65;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.mv-loading-label {
+  font-size: 0.78rem;
+  color: #5A6B68;
+  letter-spacing: 0.03em;
+}
+
+/* ── Error state ──────────────────────────────────────────────── */
+.mv-error {
+  display: none;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: #F8F6F3;
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  z-index: 11;
+}
+
+.mv-error p {
+  font-size: 0.84rem;
+  color: #5A6B68;
+  line-height: 1.7;
+}
+
+.mv-error code {
+  display: inline-block;
+  background: #EDE9E4;
+  color: #326C65;
+  font-size: 0.75rem;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+/* ── Hotspot labels ───────────────────────────────────────────── */
+.hotspot {
+  background: #326C65;
+  border: none;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s;
+}
+.hotspot:hover { transform: scale(1.4); }
+
+.hotspot-label {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1C2420;
+  color: #F8F6F3;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.3em 0.7em;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.hotspot:hover .hotspot-label,
+.hotspot:focus .hotspot-label { opacity: 1; }
+
+/* ── Interaction hint ─────────────────────────────────────────── */
+.hint-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: #8FA09D;
+  letter-spacing: 0.03em;
+}
+
+/* ── Attribution placard ──────────────────────────────────────── */
+.placard {
+  margin-top: 2.5rem;
+  padding: 0 1.5rem;
+}
+
+.placard-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  background: #EFEDE9;
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  border-left: 3px solid #326C65;
+}
+
+.placard-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #326C65;
+  margin-bottom: 0.5rem;
+}
+
+.placard-body {
+  font-size: 0.82rem;
+  color: #5A6B68;
+  line-height: 1.75;
+}
+
+.placard-body a {
+  color: #326C65;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.placard-body a:hover { color: #1C2420; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .topbar { padding: 0.9rem 1.1rem; }
+  .headline { padding: 1.5rem 1rem 0.4rem; }
+  .hint-row { flex-wrap: wrap; justify-content: center; }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  model-viewer { --model-viewer-transition-duration: 0s; }
+  .mv-progress-fill { transition: none; }
+  .hotspot { transition: none; }
+}
+

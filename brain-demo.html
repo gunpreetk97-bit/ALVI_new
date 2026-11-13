@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALVI — Interactive Brain Prototype</title>
+  <meta name="description" content="Art-directed anatomical brain illustration with contour draw-on animation, interactive neural pathways, and gentle cursor parallax.">
+  
+  <!-- Inter Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Standalone Prototype Stylesheet -->
+  <link rel="stylesheet" href="css/brain-demo.css">
+</head>
+<body>
+
+  <main class="brain-container" role="main">
+    
+    <!-- 1. Header Section -->
+    <header class="brain-header">
+      <div class="brand-pill" aria-label="ALVI Cognitive Architecture Prototype">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span>NEURAL COGNITION MODEL</span>
+      </div>
+      <h1 class="brain-title">Interactive Cognitive Atlas</h1>
+      <p class="brain-subtitle">
+        Explore anatomical functional zones associated with speech fluency, narrative memory, and executive attention.
+      </p>
+    </header>
+
+    <!-- 2. Interactive SVG Stage (Parallax & Tilt) -->
+    <section class="brain-viewport" id="brain-viewport" aria-label="Interactive Brain Diagram">
+      <div class="brain-tilt-layer" id="brain-tilt-layer">
+        
+        <svg class="brain-svg" id="brain-svg" viewBox="0 0 820 620" role="img" aria-label="Scientific sagittal illustration of the human brain">
+          <defs>
+            <!-- Soft Ambient Base Shadow -->
+            <filter id="soft-shadow" x="-10%" y="-10%" width="130%" height="130%">
+              <feDropShadow dx="0" dy="16" stdDeviation="22" flood-color="#1C2420" flood-opacity="0.05" />
+            </filter>
+            
+            <!-- Restrained Teal Pulse Gradient for Active Pathways -->
+            <linearGradient id="neuralTractGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#326C65" stop-opacity="0.2" />
+              <stop offset="50%" stop-color="#326C65" stop-opacity="0.9" />
+              <stop offset="100%" stop-color="#7A9A8B" stop-opacity="0.3" />
+            </linearGradient>
+          </defs>
+
+          <!-- Grounding Soft Radial Shadow -->
+          <ellipse cx="410" cy="580" rx="260" ry="20" fill="#326C65" opacity="0.06" />
+
+          <!-- ========================================================
+               ANATOMICAL REGIONS (Interactive Group Elements)
+               ======================================================== -->
+          
+          <!-- 1. FRONTAL LOBE (Executive Function & Motor Speech) -->
+          <g class="lobe-region" id="lobe-frontal" data-region="frontal" tabindex="0" role="button" aria-label="Frontal Lobe: Executive processing, speech initiation & planning">
+            <!-- Shaded Region Underlay -->
+            <path class="lobe-fill" 
+                  d="M 330,110 
+                     C 240,118 160,165 125,235 
+                     C 95,295 105,365 145,410 
+                     C 185,450 245,465 295,450 
+                     C 305,395 325,325 350,265 
+                     C 370,215 355,145 330,110 Z" />
+            
+            <!-- Outer Contour (Timed SVG Draw-on) -->
+            <path class="lobe-outline contour-draw" fill="none"
+                  d="M 330,110 
+                     C 275,115 210,135 165,180 
+                     C 120,225 100,285 105,350 
+                     C 110,390 135,430 175,452 
+                     C 220,475 270,470 305,450" />
+
+            <!-- Frontal Sulci & Gyri (Inner Anatomical Grooves) -->
+            <path class="lobe-sulcus sulcus-draw" fill="none"
+                  d="M 160,220 C 190,210 235,230 255,270 
+                     M 130,290 C 170,285 220,315 240,360 
+                     M 155,360 C 185,355 225,385 245,430 
+                     M 220,150 C 250,175 275,230 280,290 
+                     M 270,125 C 295,160 310,215 315,280" />
+
+            <!-- Broca's Area Landmark Spot -->
+            <circle class="neural-node" cx="245" cy="390" r="5" />
+          </g>
+
+          <!-- 2. PARIETAL LOBE (Spatial Sense & Multimodal Association) -->
+          <g class="lobe-region" id="lobe-parietal" data-region="parietal" tabindex="0" role="button" aria-label="Parietal Lobe: Sensory integration, spatial mapping & calculation">
+            <path class="lobe-fill"
+                  d="M 330,110 
+                     C 420,105 520,130 585,185 
+                     C 630,225 645,270 635,320 
+                     C 575,315 485,320 420,335 
+                     C 375,260 345,180 330,110 Z" />
+
+            <path class="lobe-outline contour-draw" fill="none"
+                  d="M 330,110 
+                     C 425,105 515,128 585,185 
+                     C 635,225 650,270 635,325" />
+
+            <path class="lobe-sulcus sulcus-draw" fill="none"
+                  d="M 365,150 C 405,190 440,240 455,305 
+                     M 425,125 C 475,170 515,225 530,285 
+                     M 495,140 C 540,185 570,235 580,280 
+                     M 420,240 C 480,245 540,220 595,245" />
+
+            <circle class="neural-node" cx="490" cy="210" r="5" />
+          </g>
+
+          <!-- 3. TEMPORAL LOBE (Speech Comprehension & Memory Processing) -->
+          <g class="lobe-region" id="lobe-temporal" data-region="temporal" tabindex="0" role="button" aria-label="Temporal Lobe: Language comprehension, verbal memory & auditory processing">
+            <path class="lobe-fill"
+                  d="M 305,450 
+                     C 285,430 280,390 310,360 
+                     C 360,310 460,310 540,325 
+                     C 575,335 600,370 580,415 
+                     C 545,465 460,490 380,485 
+                     C 335,480 310,465 305,450 Z" />
+
+            <path class="lobe-outline contour-draw" fill="none"
+                  d="M 310,365 
+                     C 365,315 460,315 545,325 
+                     C 590,335 605,370 585,420 
+                     C 555,475 470,495 385,490 
+                     C 330,485 300,460 305,450" />
+
+            <path class="lobe-sulcus sulcus-draw" fill="none"
+                  d="M 345,380 C 400,370 470,380 540,365 
+                     M 360,425 C 420,415 490,425 555,410 
+                     M 375,460 C 430,455 490,460 535,445" />
+
+            <!-- Wernicke's Area & Hippocampus Landmark Spot -->
+            <circle class="neural-node" cx="475" cy="375" r="5.5" />
+          </g>
+
+          <!-- 4. OCCIPITAL LOBE (Visual Perception & Scene Analysis) -->
+          <g class="lobe-region" id="lobe-occipital" data-region="occipital" tabindex="0" role="button" aria-label="Occipital Lobe: Visual reception, color, and scene feature decoding">
+            <path class="lobe-fill"
+                  d="M 635,325 
+                     C 675,340 705,375 700,420 
+                     C 690,465 655,495 615,505 
+                     C 590,505 575,470 575,440 
+                     C 580,390 600,350 635,325 Z" />
+
+            <path class="lobe-outline contour-draw" fill="none"
+                  d="M 635,325 
+                     C 680,345 710,380 705,430 
+                     C 695,475 660,505 615,510" />
+
+            <path class="lobe-sulcus sulcus-draw" fill="none"
+                  d="M 645,360 C 670,390 680,430 675,465 
+                     M 620,385 C 645,415 650,455 645,490 
+                     M 605,420 C 630,440 635,470 630,500" />
+
+            <circle class="neural-node" cx="660" cy="415" r="5" />
+          </g>
+
+          <!-- 5. CEREBELLUM & BRAINSTEM (Coordination, Timing & Autonomic Core) -->
+          <g class="lobe-region" id="lobe-cerebellum" data-region="cerebellum" tabindex="0" role="button" aria-label="Cerebellum & Brainstem: Fine sensorimotor timing, rhythm & autonomic stability">
+            <!-- Cerebellum (Characteristic Folia / Rhythmic horizontal striations) -->
+            <path class="lobe-fill"
+                  d="M 490,480 
+                     C 540,485 615,500 625,540 
+                     C 630,575 585,600 525,595 
+                     C 475,590 450,560 455,525 
+                     C 460,495 475,485 490,480 Z" />
+
+            <path class="lobe-outline contour-draw" fill="none"
+                  d="M 490,480 
+                     C 555,485 620,500 628,545 
+                     C 635,585 585,605 525,598 
+                     C 468,590 445,555 455,515" />
+
+            <!-- Brainstem Extension -->
+            <path class="lobe-outline contour-draw" fill="none"
+                  d="M 410,485 C 415,530 420,580 435,620 
+                     M 455,485 C 460,530 465,580 475,620" />
+
+            <!-- Foliar Fine Grooves -->
+            <path class="lobe-sulcus sulcus-draw" fill="none"
+                  d="M 480,515 C 520,515 570,525 610,540 
+                     M 470,540 C 515,540 565,550 605,565 
+                     M 465,565 C 505,565 550,575 585,585" />
+
+            <circle class="neural-node" cx="540" cy="550" r="4.5" />
+          </g>
+
+          <!-- ========================================================
+               ACTIVE NEURAL TRACTS (Connecting Pathways)
+               ======================================================== -->
+          <!-- Arcuate Fasciculus (Temporal to Frontal language highway) -->
+          <path class="neural-tract synapse-pulse" fill="none" stroke="url(#neuralTractGrad)"
+                d="M 475,375 C 440,280 340,260 245,390" />
+
+          <!-- Fronto-Parietal Executive Control Loop -->
+          <path class="neural-tract synapse-pulse" fill="none" stroke="url(#neuralTractGrad)"
+                d="M 245,220 C 310,180 410,170 490,210" />
+
+          <!-- Occipito-Temporal Memory Ventral Stream ("What" Pathway) -->
+          <path class="neural-tract synapse-pulse" fill="none" stroke="url(#neuralTractGrad)"
+                d="M 660,415 C 610,380 540,360 475,375" />
+
+          <!-- Cerebellar Timing Loop -->
+          <path class="neural-tract synapse-pulse" fill="none" stroke="url(#neuralTractGrad)"
+                d="M 540,550 C 490,520 440,440 430,370" />
+
+        </svg>
+
+      </div>
+    </section>
+
+    <!-- 3. Interactive Region Pill Selector & Detail Card -->
+    <footer class="brain-controls-area">
+      
+      <!-- Accessible Pill Selector Strip -->
+      <nav class="lobe-selector-strip" role="tablist" aria-label="Brain Lobe Selector">
+        <button type="button" class="lobe-btn selected" data-target="frontal" role="tab" aria-selected="true">
+          Frontal Lobe
+        </button>
+        <button type="button" class="lobe-btn" data-target="temporal" role="tab" aria-selected="false">
+          Temporal Lobe
+        </button>
+        <button type="button" class="lobe-btn" data-target="parietal" role="tab" aria-selected="false">
+          Parietal Lobe
+        </button>
+        <button type="button" class="lobe-btn" data-target="occipital" role="tab" aria-selected="false">
+          Occipital Lobe
+        </button>
+        <button type="button" class="lobe-btn" data-target="cerebellum" role="tab" aria-selected="false">
+          Cerebellum &amp; Stem
+        </button>
+      </nav>
+
+      <!-- Region Detail Card -->
+      <section class="region-detail-card" id="region-card" aria-live="polite">
+        <div class="region-detail-header">
+          <div class="region-tag-wrap">
+            <h2 class="region-name" id="region-name">Frontal Lobe</h2>
+            <span class="region-code-badge" id="region-code">EXECUTIVE / SPEECH MOTOR</span>
+          </div>
+          <button type="button" class="reset-view-btn" id="reset-tilt-btn" aria-label="Reset perspective tilt">
+            Reset Tilt ↺
+          </button>
+        </div>
+        <p class="region-description" id="region-desc">
+          Coordinates executive planning, working memory, and expressive motor speech (Broca's area). ALVI models hesitation pauses and syntax structure against frontal communicative baselines.
+        </p>
+      </section>
+
+      <!-- Scientific Disclaimer Notice -->
+      <p class="medical-notice">
+        Note: Functional anatomical mappings shown for conceptual exploration and research visualization. Highlighted zones reflect normative neurological association, not individual clinical imaging.
+      </p>
+
+    </footer>
+
+  </main>
+
+  <!-- Prototype Script -->
+  <script src="js/brain-demo.js"></script>
+</body>
+</html>
+

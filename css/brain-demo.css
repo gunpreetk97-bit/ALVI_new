@@ -1,0 +1,442 @@
+/* ==========================================================================
+   ALVI — STANDALONE INTERACTIVE BRAIN PROTOTYPE
+   Scientific Line Illustration, Contour Draw-on, Cursor Parallax & Regions
+   ========================================================================== */
+
+:root {
+  --bg-canvas: #F8F6F3;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F2EFE9;
+  --ink-primary: #1C2420;
+  --ink-soft: #424D47;
+  --ink-muted: #727D77;
+  --ink-faint: #A1ABA5;
+  --teal-primary: #326C65;
+  --teal-hover: #26544E;
+  --teal-light: #EBF3F2;
+  --teal-border: rgba(50, 108, 101, 0.25);
+  --border-hairline: #E5E0D8;
+  --shadow-subtle: 0 10px 32px rgba(28, 36, 32, 0.05);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Minimalist Viewport Layout ─────────────────────────────────────────── */
+.brain-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 24px 40px;
+  position: relative;
+}
+
+/* Header */
+.brain-header {
+  text-align: center;
+  max-width: 640px;
+  z-index: 10;
+}
+
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background-color: #EDE8E0;
+  border: 1px solid var(--border-hairline);
+  color: var(--teal-primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--teal-primary);
+}
+
+.brain-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ink-primary);
+  line-height: 1.2;
+}
+
+.brain-subtitle {
+  font-size: 15px;
+  color: var(--ink-muted);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* ── Interactive Stage & 3D Tilt Viewport ────────────────────────────────── */
+.brain-viewport {
+  perspective: 1200px;
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+  position: relative;
+}
+
+.brain-tilt-layer {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  transform-style: preserve-3d;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brain-svg {
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  overflow: visible;
+  filter: drop-shadow(0 14px 28px rgba(28, 36, 32, 0.04));
+}
+
+/* ── Anatomical Contours & Draw-in Animations ────────────────────────────── */
+.contour-draw {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: drawBrainStroke 2.2s cubic-bezier(0.2, 0.9, 0.3, 1) 0.2s forwards;
+}
+
+.sulcus-draw {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: drawBrainStroke 1.8s cubic-bezier(0.2, 0.9, 0.3, 1) 0.7s forwards;
+}
+
+@keyframes drawBrainStroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ── Interactive Lobe Regions ────────────────────────────────────────────── */
+.lobe-region {
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lobe-fill {
+  fill: #FFFFFF;
+  fill-opacity: 0.15;
+  transition: fill-opacity 0.35s ease, fill 0.35s ease;
+}
+
+.lobe-outline {
+  stroke: var(--ink-primary);
+  stroke-width: 2.2;
+  transition: stroke 0.3s ease, stroke-width 0.3s ease;
+}
+
+.lobe-sulcus {
+  stroke: var(--ink-soft);
+  stroke-width: 1.4;
+  opacity: 0.75;
+  transition: stroke 0.3s ease, opacity 0.3s ease;
+}
+
+/* Hover & Focus States on Lobes */
+.lobe-region:hover .lobe-fill,
+.lobe-region:focus-visible .lobe-fill {
+  fill: var(--teal-primary);
+  fill-opacity: 0.08;
+}
+
+.lobe-region:hover .lobe-outline,
+.lobe-region:focus-visible .lobe-outline {
+  stroke: var(--teal-primary);
+  stroke-width: 2.8;
+}
+
+.lobe-region:hover .lobe-sulcus,
+.lobe-region:focus-visible .lobe-sulcus {
+  stroke: var(--teal-primary);
+  opacity: 1;
+}
+
+.lobe-region.active-lobe .lobe-fill {
+  fill: var(--teal-primary);
+  fill-opacity: 0.14;
+}
+
+.lobe-region.active-lobe .lobe-outline {
+  stroke: var(--teal-primary);
+  stroke-width: 3;
+}
+
+.lobe-region.active-lobe .lobe-sulcus {
+  stroke: var(--teal-primary);
+  opacity: 1;
+}
+
+.lobe-region:focus-visible {
+  outline: none;
+}
+
+/* ── Meaningful Neural Connection Nodes & Pulses ────────────────────────── */
+.neural-tract {
+  stroke: var(--teal-primary);
+  stroke-width: 1.6;
+  stroke-dasharray: 6 6;
+  opacity: 0.45;
+  transition: opacity 0.3s ease;
+}
+
+.neural-node {
+  fill: #FFFFFF;
+  stroke: var(--teal-primary);
+  stroke-width: 2;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.3s ease;
+  cursor: pointer;
+}
+
+.neural-node:hover {
+  transform: scale(1.35);
+  fill: var(--teal-primary);
+}
+
+.synapse-pulse {
+  animation: pulseSynapse 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseSynapse {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0.35;
+  }
+  100% {
+    stroke-dashoffset: 48;
+    opacity: 0.85;
+  }
+}
+
+/* ── Interactive Info Card & Region Pill Strip ─────────────────────────── */
+.brain-controls-area {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  z-index: 10;
+}
+
+/* Accessible Selector Pills */
+.lobe-selector-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.lobe-btn {
+  appearance: none;
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-hairline);
+  color: var(--ink-soft);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(28, 36, 32, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  touch-action: manipulation;
+}
+
+.lobe-btn:hover {
+  border-color: var(--teal-primary);
+  color: var(--teal-primary);
+  background-color: var(--teal-light);
+  transform: translateY(-1px);
+}
+
+.lobe-btn.selected {
+  background-color: var(--teal-primary);
+  border-color: var(--teal-primary);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(50, 108, 101, 0.25);
+  transform: translateY(-1px);
+}
+
+.lobe-btn:focus-visible {
+  outline: 3px solid var(--teal-primary);
+  outline-offset: 2px;
+}
+
+/* Region Detail Card */
+.region-detail-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 20px;
+  padding: 18px 26px;
+  width: 100%;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.region-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.region-tag-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.region-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  letter-spacing: -0.01em;
+}
+
+.region-code-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background-color: var(--teal-light);
+  color: var(--teal-primary);
+  border: 1px solid var(--teal-border);
+}
+
+.region-clinical-note {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.region-description {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* Reset Button */
+.reset-view-btn {
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  color: var(--ink-muted);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+}
+
+.reset-view-btn:hover {
+  color: var(--teal-primary);
+}
+
+.reset-view-btn:focus-visible {
+  outline: 2px solid var(--teal-primary);
+  outline-offset: 2px;
+}
+
+/* ── Medical Integrity Notice ───────────────────────────────────────────── */
+.medical-notice {
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-align: center;
+  max-width: 580px;
+  line-height: 1.45;
+  margin-top: 8px;
+}
+
+/* ── Accessibility: Reduced Motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .contour-draw,
+  .sulcus-draw {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .brain-tilt-layer {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .synapse-pulse {
+    animation: none !important;
+  }
+}
+
+/* ── Mobile Responsive Adjustments ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .brain-container {
+    padding: 24px 16px 32px;
+  }
+
+  .brain-title {
+    font-size: 24px;
+  }
+
+  .brain-subtitle {
+    font-size: 13.5px;
+  }
+
+  .region-detail-card {
+    padding: 16px 18px;
+  }
+
+  .region-name {
+    font-size: 15px;
+  }
+
+  .lobe-btn {
+    padding: 7px 14px;
+    font-size: 12.5px;
+  }
+}
+

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALVI — Interactive 3D Brain Sculpture Prototype</title>
+  <meta name="description" content="A real, interactive 3D human brain sculpture built with Three.js, anatomical mesh detail, and museum-quality studio lighting.">
+  
+  <!-- Inter Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Scoped Stylesheet -->
+  <link rel="stylesheet" href="css/brain-3d-demo.css">
+
+  <!-- Three.js r128 UMD build — last version with examples/js/ UMD add-ons -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+
+  <!-- Fullscreen 3D Stage Overlay Container -->
+  <main class="sculpture-wrapper" role="main">
+    
+    <!-- Top Branding & Editorial Title -->
+    <header class="header-overlay">
+      <div class="brand-pill" aria-label="ALVI 3D Neural Architecture">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span>MUSEUM ANATOMICAL SCULPTURE</span>
+      </div>
+      <h1 class="sculpture-title">3D Cortical Architecture</h1>
+      <p class="sculpture-subtitle">High-fidelity anatomical human brain mesh rendered in physical studio lighting.</p>
+    </header>
+
+    <!-- WebGL Three.js Canvas Container -->
+    <div id="webgl-canvas-container" tabindex="0" aria-label="Interactive 3D Brain: Drag with mouse or touch to rotate, scroll to zoom."></div>
+
+    <!-- Loading Screen Overlay -->
+    <div class="loading-overlay" id="loading-overlay" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="loading-text" id="loading-status-text">Loading high-resolution 3D anatomical mesh…</p>
+      <span class="loading-subtext">Compiling physical PBR shaders &amp; studio lighting</span>
+    </div>
+
+    <!-- Bottom Controls & Museum Placard -->
+    <footer class="bottom-overlay">
+      
+      <!-- Interactive Information Placard -->
+      <section class="placard-card">
+        <div class="placard-left">
+          <span class="placard-tag">Anatomical Specification</span>
+          <h2 class="placard-name">Human Cerebral Cortex &amp; Cerebellum</h2>
+          <p class="placard-desc">Gyri, sulci, and brainstem derived from open neuroimaging atlases (Z-Anatomy / MNI).</p>
+        </div>
+        <button type="button" class="btn-reset-view" id="btn-reset-camera" aria-label="Reset 3D camera to default orientation">
+          Reset Perspective ↺
+        </button>
+      </section>
+
+      <!-- Interaction Guidance -->
+      <div class="interaction-hint">
+        <span>✋ Drag to rotate freely</span>
+        <span>•</span>
+        <span>🔍 Scroll / pinch to zoom</span>
+        <span>•</span>
+        <span>⏳ Auto-rotates when idle</span>
+      </div>
+
+      <!-- Legal Attribution & Provenance -->
+      <p class="attribution-note">
+        3D Brain Model: Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> via Z-Anatomy / DBCLS / Itay Inbar (BrainProject).
+      </p>
+
+    </footer>
+
+  </main>
+
+  <!-- Prototype Three.js Application Script (plain script — globals from UMD) -->
+  <script src="js/brain-3d-demo.js"></script>
+</body>
+</html>
+

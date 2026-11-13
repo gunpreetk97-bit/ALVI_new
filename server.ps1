@@ -31,6 +31,9 @@ $mimeMap = @{
     ".webm" = "audio/webm"
     ".wav"  = "audio/wav"
     ".mp3"  = "audio/mpeg"
+    ".glb"  = "model/gltf-binary"
+    ".gltf" = "model/gltf+json"
+    ".bin"  = "application/octet-stream"
 }
 
 try {
